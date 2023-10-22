@@ -1,6 +1,7 @@
 //---
 import * as PIXI from "pixi.js"
 import { tiles } from "./tileManifest";
+import Board from "../../Game/Components/board";
 //---
 
 // PIXI.scaleModes.DEFAULT = PIXI.scaleModes.NEAREST;
@@ -41,8 +42,9 @@ let test;
 let board = new Array(height).fill(null).map(() => new Array(width).fill(null));
 const tileWidth = 100;
 app.stage.scale.set(.75);
-
-createGrid()
+const gBoard = new Board(height, width, tileWidth, () => {console.log("clicked")});
+const grid = gBoard.createGrid()
+app.stage.addChild(grid);
 addTiles()
 
 console.log(getCount());
@@ -56,27 +58,7 @@ function getCount() {
   }
   return count;
 }
-function createGrid() {
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const graphics = new PIXI.Graphics()
-      if ((x + y) % 2 === 1) graphics.beginFill(0xeeeeee)
-      else graphics.beginFill(0xdddddd);
 
-      const rect = graphics.drawRect(x * tileWidth, y * tileWidth, tileWidth, tileWidth)
-      rect.eventMode = "dynamic"
-      rect.onpointerdown = (event) => {
-        event.preventDefault()
-
-        if (!gameOver) {
-          checkClear(x, y);
-          console.log(getCount())
-        }
-      }
-      app.stage.addChild(rect)
-    }
-  }
-}
 
 function addTiles() {
   const numPairs = 100;
