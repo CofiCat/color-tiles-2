@@ -1,12 +1,15 @@
 //---
 import * as PIXI from "pixi.js"
-import { tiles } from "./tiles";
+import { tiles } from "./tileManifest";
 //---
 
+// PIXI.scaleModes.DEFAULT = PIXI.scaleModes.NEAREST;
 
 const app = new PIXI.Application({
   background: "ffffff",
-  resizeTo: window
+  antialias: true,
+  resizeTo: window,
+  resolution: window.devicePixelRatio
 })
 
 const score = document.getElementById('score')
@@ -27,7 +30,7 @@ window.setInterval(() => {
     gameOver = true;
   }
 }, 1000)
-app.
+
 
 const height = 15;
 const width = 23;
@@ -36,7 +39,8 @@ const tileNames: Array<string> = ["red", "orange", "blue", "purple", "pink", "gr
 let test;
 
 let board = new Array(height).fill(null).map(() => new Array(width).fill(null));
-const tileWidth = 40;
+const tileWidth = 100;
+app.stage.scale.set(.75);
 
 createGrid()
 addTiles()
@@ -92,7 +96,9 @@ function createTile(x: number, y: number, data: typeof tiles[0]) {
   tile.x = x * tileWidth;
   tile.y = y * tileWidth;
   tile.eventMode = "static"
-  tile.scale.set(data.scale);
+  // tile.scale.set(data.scale);
+  tile.width = tileWidth;
+  tile.height = tileWidth;
 
   board[y][x] = {
     tileData: {
@@ -180,16 +186,21 @@ function genRandomPair() {
 }
 
 function clearBlockAnimation(spriteRef: PIXI.Sprite) {
-  const speed = 10;
+
+  const velocity = { x: 10, y: -10 }
+  const acceleration = { x: 0, y: 0 }
+  const gravity = 4;
   const anim = window.setInterval((xDir: number) => {
-    spriteRef.x += speed * xDir;
-    spriteRef.y += speed
+    spriteRef.x += velocity.x * xDir;
+    spriteRef.y += velocity.y
+    velocity.y += acceleration.y + gravity;
+    velocity.x += acceleration.x
+    spriteRef.rotation += xDir / 100;
     console.log(xDir);
-  }, 1000 / 40, Math.random() * 10 - 5)
+  }, 1000 / 50, Math.random() * 10 - 5)
 
   window.setTimeout(() => {
     window.clearInterval(anim)
     app.stage.removeChild(spriteRef);
   }, 500)
-
 }
