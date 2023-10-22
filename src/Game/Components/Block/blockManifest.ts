@@ -1,4 +1,5 @@
-export const tiles = [
+
+const BlockManifest = [
   {
     path: "/sprites/tile/red.png",
     color: "red",
@@ -70,3 +71,5 @@ export const tiles = [
   //   scale: .41,
   // },
 ]
+
+export default BlockManifest; 

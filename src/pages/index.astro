@@ -1,5 +1,5 @@
 ---
-import Board from "../layouts/board/Board.astro";
+import Game from "../layouts/Game.astro";
 ---
 
 <html lang="en">
@@ -11,9 +11,11 @@ import Board from "../layouts/board/Board.astro";
 		<title>Color Tiles 2</title>
 	</head>
 	<body>
-  	<h1 id="score">0</h1>
-		<progress value="100" max="100" id="progress-timer"></progress>
-		<Board/>
+  	<!-- <h1 id="score">0</h1>
+		<progress value="100" max="100" id="progress-timer"></progress> -->
+		<Game/>
+		<button id="undo">UNDO</button>
+
 	</body>
 </html>
 
