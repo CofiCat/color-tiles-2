@@ -77,5 +77,15 @@ export const IntersectionChecker = {
     }
     return board[y][x]
   }
+
+
+}
+
+export function mouseCoordinatesToTileIndex(mouseX: number, mouseY: number, tileWidth: number) {
+  const x = Math.floor(mouseX / tileWidth);
+  const y = Math.floor(mouseY / tileWidth);
+  // const x = mouseX / tileWidth
+  // const y = mouseY / tileWidth
+  return { x, y }
 }
 

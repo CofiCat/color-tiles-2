@@ -3,18 +3,25 @@ import * as PIXI from "pixi.js"
 import Board from "./Components/Board/Board"
 import Logic from "./Systems/Logic";
 import { Howl, Howler } from 'howler';
+import { mouseCoordinatesToTileIndex } from "./Systems/util";
+import AttackIndicator from "./Components/AttackIndicator/AttackIndicator";
 //---
 
 
+const height = 15, width = 23;
+const tileWidth = window.innerWidth / 1.2 / width;
 
 const app = new PIXI.Application<HTMLCanvasElement>({
   background: "ffffff",
   antialias: true,
   // resizeTo: window,
-  width: window.innerWidth - 100,
-  height: window.innerHeight - 100,
-  resolution: window.devicePixelRatio
+  width: width * tileWidth,
+  height: height * tileWidth,
+  resolution: window.devicePixelRatio,
+
 })
+
+app.renderer.plugins.interaction.cursorStyles.default = 'none'
 
 const undoButton = document.getElementById('undo');
 if (!undoButton) throw new Error('null undo button')
@@ -23,8 +30,7 @@ htmlContainer?.appendChild(app.view);
 
 // app.stage.scale.set(window.innerWidth / 1920);
 
-const height = 15, width = 23;
-const tileWidth = window.innerWidth / 1.2 / width;
+
 
 
 const theme = {
@@ -49,15 +55,21 @@ const undergroundMusic = new Howl({
 
 
 // Play the sound.
-undergroundMusic.play();
-// nightMusic.play()
+// undergroundMusic.play();
+nightMusic.play()
 // Change global volume.
 Howler.volume(.2);
 
+//init GAME LOGIC
 const logic = new Logic(height, width, tileWidth);
+
+//init BOARD
 const board = new Board(height, width, tileWidth, (x: number, y: number) => {
   logic.checkClear(x, y)
 }, curTheme.primary, curTheme.secondary);
+
+//init ATTACK INDICATOR
+const attackIndicator = new AttackIndicator(tileWidth, logic.boardData);
 
 const tiles = logic.generateTiles();
 const grid = board.createGrid();
@@ -65,18 +77,21 @@ const grid = board.createGrid();
 undoButton.onclick = () => logic.undo(app.stage)
 
 app.stage.addChild(grid, tiles);
+app.stage.addChild(...attackIndicator.render());
 
-
-
-const graphics = new PIXI.Graphics()
-graphics.beginFill(0xff00ff);
-const circle = graphics.drawCircle(0, 0, 20)
-app.stage.addChild(circle)
-
+let mousePos = { x: 0, y: 0 }
 app.stage.onmousemove = ((event) => {
-  // console.log(event.screenX, event.screenY)
-  circle.x = event.screenX
-  circle.y = event.screenY
-  console.log(circle.x, circle.y)
-  // console.log(event);
+  mousePos.x = event.screenX
+  mousePos.y = event.screenY
 })
+app.ticker.add(() => {
+  console.log("ticking")
+  attackIndicator.update(mousePos)
+
+}
+);
+app.ticker.start();
+
+// const animate = (time: number) => {
+//   app.ticker.update(time);
+// }

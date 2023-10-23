@@ -19,25 +19,53 @@ export default class Block {
     this.data = data;
   }
 
+  /**
+   * Get the position of a sprite in PIXI stage
+   * @returns Object with x and y position
+   */
   getWorldPos() {
     return { x: this.sprite.x, y: this.sprite.y }
   }
 
+  /**
+   * Get the index of object relative to game board
+   * @returns Object with x and y position
+   */
   getBoardPos() {
     return this.boardPos;
   }
 
-  setPos(x: number, y: number) {
+  /**
+   * set current position of sprite in world
+   * @param x pos
+   * @param y pos
+   */
+  setWorldPos(x: number, y: number) {
     this.sprite.x = x;
     this.sprite.y = y;
   }
 
+  setBoardPos() {
+
+  }
+
+  /**
+   * 
+   * @returns sprite ref
+   */
   getSprite() {
     return this.sprite;
   }
 
+  /**
+   * destorys current sprite
+   */
   destroy() {
     this.sprite.destroy()
+  }
+
+  getWorldBoundingBox() {
+
   }
 
   clearBlockAnimation() {
