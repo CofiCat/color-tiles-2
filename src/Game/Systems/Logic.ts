@@ -97,12 +97,11 @@ export default class Logic {
           if (val1?.data?.color === val2?.data?.color && val1 != null && val2 != null) {
             hits.add(val1);
             hits.add(val2);
-
           }
         }
       })
     })
-    this.moveStack.push(hits);
+
     hits.forEach((block: Block) => {
       // increaseScore()
       console.log(block.data.color)
@@ -110,9 +109,19 @@ export default class Logic {
       const blockPos = block.getBoardPos();
       this.boardData[blockPos.y][blockPos.x] = null;
     })
-    if (hits.size === 0) {
-      progressTimer.value -= 200;
+
+    if (hits.size > 0) {
+      this.moveStack.push(hits);
+      const popSound = new Howl({
+        src: ['/sounds/effects/pop.mp3'],
+        volume: .1
+      })
+
+      popSound.play();
     }
+    // if (hits.size === 0) {
+    //   progressTimer.value -= 200;
+    // }
   }
 
   undo(stage: Container<DisplayObject>) {

@@ -1,4 +1,5 @@
 import { Sprite } from "pixi.js";
+import { Howl, Howler } from 'howler';
 import type BlockManifest from "./blockManifest";
 
 export default class Block {
@@ -40,6 +41,15 @@ export default class Block {
   }
 
   clearBlockAnimation() {
+    // const popSound = new Howl({
+    //   src: ['/sounds/effects/pop.mp3'],
+    //   volume: .5
+    // })
+
+    // window.setTimeout(() => {
+    //   popSound.play();
+    // }, Math.random() * 500)
+
     const velocity = { x: 10, y: -10 }
     const acceleration = { x: 0, y: 0 }
     const gravity = 4;
@@ -54,6 +64,6 @@ export default class Block {
     window.setTimeout(() => {
       window.clearInterval(anim)
       this.destroy();
-    }, 500)
+    }, 2000)
   }
 }
