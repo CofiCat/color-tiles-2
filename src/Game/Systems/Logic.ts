@@ -24,10 +24,15 @@ export default class Logic {
   tick() {
     let toRemove = new Set();
     for (let i = 0; i < this.tickers.length; i++) {
-      if (this.tickers[i].lifetime > 0) {
-        this.tickers[i].tick();
+      const cur = this.tickers[i];
+      if (cur.hasLifetime()) {
+        if (cur.getLifetime() > 0) {
+          cur.tick();
+        } else {
+          toRemove.add(i);
+        }
       } else {
-        toRemove.add(i);
+        cur.tick();
       }
     }
     if (toRemove.size === 0) return;
@@ -190,5 +195,9 @@ export default class Logic {
       );
       stage.addChild(newBlock.sprite);
     });
+  }
+
+  addTickers(data: [any]) {
+    this.tickers.push(...data);
   }
 }

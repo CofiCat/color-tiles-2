@@ -3,18 +3,23 @@ import type BlockManifest from "./blockManifest";
 import Mover from "../../Systems/Mover";
 
 export default class Block extends Mover {
-  sprite: Sprite
-  destroyed: boolean
-  boardPos: { x: number, y: number }
-  data: typeof BlockManifest[number]
-  lifetime: number
+  private sprite: Sprite;
+  private destroyed: boolean;
+  private boardPos: { x: number; y: number };
+  private data: (typeof BlockManifest)[number];
+  private lifetime: number;
 
-  constructor(data: typeof BlockManifest[number], x: number, y: number, width: number) {
-    super(x, y, 1)
+  constructor(
+    data: (typeof BlockManifest)[number],
+    x: number,
+    y: number,
+    width: number
+  ) {
+    super(x, y, 1);
     this.sprite = Sprite.from(data.path);
     this.sprite.x = x;
     this.sprite.y = y;
-    this.boardPos = { x, y }
+    this.boardPos = { x, y };
     this.sprite.width = width;
     this.sprite.height = width;
     this.destroyed = false;
@@ -27,7 +32,7 @@ export default class Block extends Mover {
    * @returns Object with x and y position
    */
   getWorldPos() {
-    return { x: this.sprite.x, y: this.sprite.y }
+    return { x: this.sprite.x, y: this.sprite.y };
   }
 
   /**
@@ -48,12 +53,10 @@ export default class Block extends Mover {
     this.sprite.y = y;
   }
 
-  setBoardPos() {
-
-  }
+  setBoardPos() {}
 
   /**
-   * 
+   *
    * @returns sprite ref
    */
   getSprite() {
@@ -64,12 +67,10 @@ export default class Block extends Mover {
    * destorys current sprite
    */
   destroy() {
-    this.sprite.destroy()
+    this.sprite.destroy();
   }
 
-  getWorldBoundingBox() {
-
-  }
+  getWorldBoundingBox() {}
 
   tick() {
     this.update();
@@ -77,14 +78,20 @@ export default class Block extends Mover {
     this.sprite.y = this.pos.y;
     if (this.destroyed) {
       this.lifetime -= 1;
-      this.clearBlockAnimation()
+      this.clearBlockAnimation();
     }
+  }
+  hasLifetime() {
+    return this.hasLifetime;
+  }
 
+  getLifetime() {
+    return this.lifetime;
   }
 
   clearBlockAnimation() {
     if (this.lifetime <= 0) {
-      this.destroy()
+      this.destroy();
     }
   }
 }

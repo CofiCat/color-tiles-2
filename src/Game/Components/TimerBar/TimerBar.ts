@@ -1,25 +1,53 @@
-import { Container, Graphics } from "pixi.js"
+import { Container, Graphics } from "pixi.js";
 
 export default class {
-  maxTime: number
-  curTime: number
-  container: Container
-  constructor(maxTime: number) {
+  private maxTime: number;
+  private curTime: number;
+  private container: Container;
+  private progressContainer: Container;
+  private width: number;
+  // private progressBar: Graphics;
+  constructor(maxTime: number, width: number) {
     this.maxTime = maxTime;
-    this.curTime = 0;
-    this.container = new Container()
+    this.curTime = maxTime;
+    this.container = new Container();
+    this.progressContainer = new Container();
+    this.width = width;
   }
 
-  render() {
+  init() {
     const graphics = new Graphics();
-    graphics.beginFill(0xffffff);
-    const outer = graphics.drawRoundedRect(0, 0, 10, 1, .2);
-    this.container.addChild(outer);
-    return this.container
+    graphics.beginFill(0x222222);
+    const outer = graphics.drawRoundedRect(0, 0, this.width, 0.5, 0.2);
+    this.drawProgress();
+    this.container.addChild(outer, this.progressContainer);
+    return this.container;
   }
 
-  update() {
-    this.curTime += 1;
+  tick() {
+    this.curTime -= 1;
+    this.drawProgress();
   }
 
+  drawProgress() {
+    this.progressContainer.removeChildren();
+
+    const remainder = this.width / (this.maxTime / this.curTime);
+
+    const graphics = new Graphics();
+    graphics.beginFill(0x444444);
+    const progress = graphics.drawRoundedRect(0, 0, remainder, 0.5, 0.2);
+    this.progressContainer.addChild(progress);
+  }
+
+  getContainer() {
+    return this.container;
+  }
+
+  hasLifetime() {
+    return false;
+  }
+  hasEnded() {
+    return this.curTime <= 0;
+  }
 }
