@@ -5,6 +5,7 @@ import Logic from "./Systems/Logic";
 import { Howl, Howler } from 'howler';
 import { mouseCoordinatesToTileIndex } from "./Systems/util";
 import AttackIndicator from "./Components/AttackIndicator/AttackIndicator";
+import TimerBar from "./Components/TimerBar/TimerBar";
 //---
 
 
@@ -21,7 +22,7 @@ const app = new PIXI.Application<HTMLCanvasElement>({
 
 })
 
-app.renderer.plugins.interaction.cursorStyles.default = 'none'
+app.renderer.events.cursorStyles.default = 'none'
 
 const undoButton = document.getElementById('undo');
 if (!undoButton) throw new Error('null undo button')
@@ -55,8 +56,8 @@ const undergroundMusic = new Howl({
 
 
 // Play the sound.
-// undergroundMusic.play();
-nightMusic.play()
+undergroundMusic.play();
+// nightMusic.play()
 // Change global volume.
 Howler.volume(.2);
 
@@ -71,13 +72,19 @@ const board = new Board(height, width, tileWidth, (x: number, y: number) => {
 //init ATTACK INDICATOR
 const attackIndicator = new AttackIndicator(tileWidth, logic.boardData);
 
+//init Timer Bar
+const timerBar = new TimerBar(10000);
+
 const tiles = logic.generateTiles();
 const grid = board.createGrid();
 
 undoButton.onclick = () => logic.undo(app.stage)
 
-app.stage.addChild(grid, tiles);
+app.stage.addChild(grid, tiles, timerBar.render());
 app.stage.addChild(...attackIndicator.render());
+
+
+console.log(logic.getBlockCount())
 
 let mousePos = { x: 0, y: 0 }
 app.stage.onmousemove = ((event) => {
@@ -85,9 +92,7 @@ app.stage.onmousemove = ((event) => {
   mousePos.y = event.screenY
 })
 app.ticker.add(() => {
-  console.log("ticking")
   attackIndicator.update(mousePos)
-
 }
 );
 app.ticker.start();

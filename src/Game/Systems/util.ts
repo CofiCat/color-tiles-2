@@ -12,7 +12,7 @@ export function genRandomPair(board: Array<Array<null | Block>>) {
   while (board[c1.y][c1.x] != null) {
     c1 = { x: Math.floor(Math.random() * (board[0].length)), y: Math.floor(Math.random() * (board.length)) };
   }
-  while (board[c2.y][c2.x] != null) {
+  while (board[c2.y][c2.x] != null && c2.x != c1.x) {
     c2 = { x: Math.floor(Math.random() * (board[0].length)), y: Math.floor(Math.random() * (board.length)) };
   }
   return [c1, c2]

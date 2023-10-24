@@ -60,9 +60,17 @@ export default class Logic {
 
       const randomPair = genRandomPair(this.boardData);
 
-      container.addChild(this.setTileAtPos(tileData, randomPair[0].x, randomPair[0].y, this.tileWidth).getSprite());
-      container.addChild(this.setTileAtPos(tileData, randomPair[1].x, randomPair[1].y, this.tileWidth).getSprite());
+      this.setTileAtPos(tileData, randomPair[0].x, randomPair[0].y, this.tileWidth);
+      this.setTileAtPos(tileData, randomPair[1].x, randomPair[1].y, this.tileWidth);
+    }
 
+    for (let i = 0; i < this.boardData.length; i++) {
+      for (let j = 0; j < this.boardData[0].length; j++) {
+        const cur = this.boardData[i][j];
+        if (cur) {
+          container.addChild(cur.getSprite())
+        }
+      }
     }
     return container;
   }

@@ -45,7 +45,6 @@ export default class AttackIndicator {
     this.cursor.position.x = mouseCoords.x;
     this.cursor.position.y = mouseCoords.y;
     if (this.gridSnap) {
-      console.log(this.boardCoords)
       this.container.x = this.boardCoords.x * this.tileWidth + (this.tileWidth / 2)
       this.container.y = this.boardCoords.y * this.tileWidth + (this.tileWidth / 2)
     } else {
