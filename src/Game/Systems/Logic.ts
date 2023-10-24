@@ -27,20 +27,17 @@ export default class Logic {
       if (this.tickers[i].lifetime > 0) {
         this.tickers[i].tick();
       } else {
-        // console.log("removing", this.tickers[i]);
         toRemove.add(i);
       }
     }
     if (toRemove.size === 0) return;
 
     let newTickers = [];
-    console.log("cleaning tickers");
     for (let i = 0; i < this.tickers.length; i++) {
       if (!toRemove.has(i)) {
         newTickers.push(this.tickers[i]);
       }
     }
-    console.log(newTickers, this.tickers);
     this.tickers = newTickers;
   }
 
@@ -184,7 +181,6 @@ export default class Logic {
   undo(stage: Container<DisplayObject>) {
     const prevMove = this.moveStack.pop();
     if (!prevMove) return;
-    console.log("undoing", prevMove);
     prevMove.forEach((block: Block) => {
       const newBlock = this.setTileAtPos(
         block.data,
@@ -196,10 +192,3 @@ export default class Logic {
     });
   }
 }
-
-// event.preventDefault()
-// this.handleTileClick();
-// if (!gameOver) {
-//   checkClear(x, y);
-//   console.log(getCount())
-// }

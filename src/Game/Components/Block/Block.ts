@@ -1,8 +1,6 @@
 import { Sprite } from "pixi.js";
-import { Howl, Howler } from 'howler';
 import type BlockManifest from "./blockManifest";
 import Mover from "../../Systems/Mover";
-import Animator from "../../Systems/Animator";
 
 export default class Block extends Mover {
   sprite: Sprite

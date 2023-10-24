@@ -29,7 +29,7 @@ export default class AttackIndicator {
     this.cursor = new Container();
     this.tileWidth = tileWidth;
     this.board = board;
-    this.gridSnap = true;
+    this.gridSnap = false;
     this.tracerRadius = .15
     this.boardCoords = { x: 0, y: 0 }
   }

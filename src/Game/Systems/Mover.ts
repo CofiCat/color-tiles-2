@@ -69,7 +69,6 @@ export default class Mover {
 }
 
 function clamp(val: number, min?: number, max?: number) {
-  console.log('val', val)
   if (min && val < min) {
     return min;
   }

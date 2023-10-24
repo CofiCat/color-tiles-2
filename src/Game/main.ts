@@ -11,18 +11,18 @@ import TimerBar from "./Components/TimerBar/TimerBar";
 
 const height = 15, width = 23;
 const tileWidth = 1;
-
+const scale = 100;
 const app = new PIXI.Application<HTMLCanvasElement>({
   background: "ffffff",
   antialias: true,
-  resizeTo: window,
-  // width: width * tileWidth,
-  // height: height * tileWidth,
+  // resizeTo: window,
+  width: width * tileWidth * scale,
+  height: height * tileWidth * scale,
   resolution: window.devicePixelRatio,
 
 })
 
-app.renderer.events.cursorStyles.default = 'none'
+// app.renderer.events.cursorStyles.default = 'none'
 
 const undoButton = document.getElementById('undo');
 if (!undoButton) throw new Error('null undo button')
@@ -78,8 +78,8 @@ const grid = board.createGrid();
 undoButton.onclick = () => logic.undo(app.stage)
 
 app.stage.addChild(grid, tiles);
-// app.stage.addChild(timerBar.render());
 app.stage.addChild(...attackIndicator.render());
+// app.stage.addChild(timerBar.render());
 
 
 console.log(logic.getBlockCount())
@@ -87,8 +87,11 @@ console.log(logic.getBlockCount())
 let mousePos = { x: 0, y: 0 }
 
 app.stage.onmousemove = ((event) => {
+
   mousePos.x = event.screenX / app.stage.width * width
   mousePos.y = event.screenY / app.stage.height * height
+  console.log(mousePos);
+  console.log(app.stage.height, height);
 })
 
 app.ticker.add(() => {
