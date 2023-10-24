@@ -3,9 +3,9 @@ type Vector2 = {
   y: number,
 }
 
-const drag = 0;
-const scale = 3000;
-const gravity = 9.8 / scale
+const scale = 60;
+const gravity = .2 / scale
+const drag = .00001 / scale;
 
 const terminalVelocity = 10 / scale;
 export default class Mover {
@@ -28,13 +28,18 @@ export default class Mover {
 
     this.velocity.x += this.acceleration.x;
     this.velocity.y += this.acceleration.y;
+    this.velocity.x = clamp(this.velocity.x, -2, 2);
+    this.velocity.x = clamp(this.velocity.x, -2, 2);
 
     this.velocity.x
     this.pos.x += this.velocity.x;
     this.pos.y += this.velocity.y;
 
-    this.acceleration.x -= drag;
-    this.acceleration.y -= drag;
+    this.acceleration.x = 0;
+    this.acceleration.y = 0;
+
+    // this.acceleration.x *= drag;
+    // this.acceleration.y *= drag;
 
     // this.acceleration.x = this.acceleration.x < 0 ? 0 : this.acceleration.x;
     // this.acceleration.x = this.acceleration.x < 0 ? 0 : this.acceleration.x;
@@ -61,12 +66,15 @@ export default class Mover {
     this.hasGravity = hasGravity;
   }
 
-  clamp(val: number, min?: number, max?: number) {
-    if (min && val < min) {
-      val = min;
-    }
-    if (max && val > max) {
-      val = max;
-    }
+}
+
+function clamp(val: number, min?: number, max?: number) {
+  console.log('val', val)
+  if (min && val < min) {
+    return min;
   }
+  else if (max && val > max) {
+    return max;
+  }
+  return val;
 }

@@ -21,7 +21,7 @@ export default class Block extends Mover {
     this.sprite.height = width;
     this.destroyed = false;
     this.data = data;
-    this.lifetime = 60;
+    this.lifetime = 120;
   }
 
   /**
@@ -85,27 +85,8 @@ export default class Block extends Mover {
   }
 
   clearBlockAnimation() {
-    console.log(this.lifetime);
     if (this.lifetime <= 0) {
       this.destroy()
     }
-
-
-    const velocity = { x: 1, y: 1 }
-    const acceleration = { x: 0, y: 0 }
-    const gravity = .02;
-    // const anim = window.setInterval((xDir: number) => {
-    // this.sprite.x += velocity.x * xDir;
-    // this.sprite.y += velocity.y
-    // velocity.y += acceleration.y + gravity;
-    // velocity.x += acceleration.x
-    // this.sprite.rotation += xDir / 100;
-    // }, 1000 / 50, Math.random() * 2 - 1)
-
-    // window.setTimeout(() => {
-    //   window.clearInterval(anim)
-    //   this.destroy();
-    //   console.log('destroyed object')
-    // }, 2000)
   }
 }

@@ -10,18 +10,19 @@ export default class Logic {
   boardData: Array<Array<null | Block>>;
   tileWidth: number;
   moveStack: Array<Set<Block>>;
-  tickers: Array<any>
+  tickers: Array<any>;
 
   constructor(height: number, width: number, tileWidth: number) {
-    this.boardData = new Array(height).fill(null).map(() => new Array(width).fill(null));
-    this.tileWidth = tileWidth
+    this.boardData = new Array(height)
+      .fill(null)
+      .map(() => new Array(width).fill(null));
+    this.tileWidth = tileWidth;
     this.moveStack = [];
     this.tickers = [];
   }
 
   tick() {
-
-    let toRemove = new Set()
+    let toRemove = new Set();
     for (let i = 0; i < this.tickers.length; i++) {
       if (this.tickers[i].lifetime > 0) {
         this.tickers[i].tick();
@@ -32,7 +33,7 @@ export default class Logic {
     }
     if (toRemove.size === 0) return;
 
-    let newTickers = []
+    let newTickers = [];
     console.log("cleaning tickers");
     for (let i = 0; i < this.tickers.length; i++) {
       if (!toRemove.has(i)) {
@@ -44,14 +45,14 @@ export default class Logic {
   }
 
   /**
-   * 
+   *
    * @returns the active number of Blocks
    */
   public getBlockCount(): number {
     let count = 0;
     for (let i = 0; i < this.boardData.length; i++) {
       for (let j = 0; j < this.boardData[0].length; j++) {
-        if (this.boardData[i][j] != null) count++
+        if (this.boardData[i][j] != null) count++;
       }
     }
     return count;
@@ -87,15 +88,25 @@ export default class Logic {
 
       const randomPair = genRandomPair(this.boardData);
 
-      this.setTileAtPos(tileData, randomPair[0].x, randomPair[0].y, this.tileWidth);
-      this.setTileAtPos(tileData, randomPair[1].x, randomPair[1].y, this.tileWidth);
+      this.setTileAtPos(
+        tileData,
+        randomPair[0].x,
+        randomPair[0].y,
+        this.tileWidth
+      );
+      this.setTileAtPos(
+        tileData,
+        randomPair[1].x,
+        randomPair[1].y,
+        this.tileWidth
+      );
     }
 
     for (let i = 0; i < this.boardData.length; i++) {
       for (let j = 0; j < this.boardData[0].length; j++) {
         const cur = this.boardData[i][j];
         if (cur) {
-          container.addChild(cur.getSprite())
+          container.addChild(cur.getSprite());
         }
       }
     }
@@ -103,15 +114,20 @@ export default class Logic {
   }
 
   /**
-   * 
+   *
    * @param data block Manifest Data
    * @param x pos
    * @param y pos
    * @param tileWidth width of tile
    * @returns newly created Block
    */
-  private setTileAtPos(data: typeof TileManifest[number], x: number, y: number, tileWidth: number): Block {
-    const block = new Block(data, x, y, tileWidth)
+  private setTileAtPos(
+    data: (typeof TileManifest)[number],
+    x: number,
+    y: number,
+    tileWidth: number
+  ): Block {
+    const block = new Block(data, x, y, tileWidth);
     this.boardData[y][x] = block;
     return block;
   }
@@ -129,31 +145,34 @@ export default class Logic {
     dirs.forEach((val1, i) => {
       dirs.forEach((val2, j) => {
         if (i != j) {
-          if (val1?.data?.color === val2?.data?.color && val1 != null && val2 != null) {
+          if (
+            val1?.data?.color === val2?.data?.color &&
+            val1 != null &&
+            val2 != null
+          ) {
             hits.add(val1);
             hits.add(val2);
           }
         }
-      })
-    })
+      });
+    });
 
     hits.forEach((block: Block) => {
       // increaseScore()
-      console.log(block.data.color)
-      this.tickers.push(block)
+      this.tickers.push(block);
       block.destroyed = true;
       block.hasGravity = true;
-      block.applyForce({ x: 1, y: -10 })
+      block.applyForce({ x: Math.random() * 5 - 2.5, y: -3 });
       const blockPos = block.getBoardPos();
       this.boardData[blockPos.y][blockPos.x] = null;
-    })
+    });
 
     if (hits.size > 0) {
       this.moveStack.push(hits);
       const popSound = new Howl({
-        src: ['/sounds/effects/pop.mp3'],
-        volume: .1
-      })
+        src: ["/sounds/effects/pop.mp3"],
+        volume: 0.1,
+      });
 
       popSound.play();
     }
@@ -163,16 +182,20 @@ export default class Logic {
   }
 
   undo(stage: Container<DisplayObject>) {
-    const prevMove = this.moveStack.pop()
+    const prevMove = this.moveStack.pop();
     if (!prevMove) return;
-    console.log('undoing', prevMove);
+    console.log("undoing", prevMove);
     prevMove.forEach((block: Block) => {
-      const newBlock = this.setTileAtPos(block.data, block.getBoardPos().x, block.getBoardPos().y, this.tileWidth);
+      const newBlock = this.setTileAtPos(
+        block.data,
+        block.getBoardPos().x,
+        block.getBoardPos().y,
+        this.tileWidth
+      );
       stage.addChild(newBlock.sprite);
-    })
+    });
   }
 }
-
 
 // event.preventDefault()
 // this.handleTileClick();
