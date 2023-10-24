@@ -10,10 +10,37 @@ export default class Logic {
   boardData: Array<Array<null | Block>>;
   tileWidth: number;
   moveStack: Array<Set<Block>>;
+  tickers: Array<any>
+
   constructor(height: number, width: number, tileWidth: number) {
     this.boardData = new Array(height).fill(null).map(() => new Array(width).fill(null));
     this.tileWidth = tileWidth
     this.moveStack = [];
+    this.tickers = [];
+  }
+
+  tick() {
+
+    let toRemove = new Set()
+    for (let i = 0; i < this.tickers.length; i++) {
+      if (this.tickers[i].lifetime > 0) {
+        this.tickers[i].tick();
+      } else {
+        // console.log("removing", this.tickers[i]);
+        toRemove.add(i);
+      }
+    }
+    if (toRemove.size === 0) return;
+
+    let newTickers = []
+    console.log("cleaning tickers");
+    for (let i = 0; i < this.tickers.length; i++) {
+      if (!toRemove.has(i)) {
+        newTickers.push(this.tickers[i]);
+      }
+    }
+    console.log(newTickers, this.tickers);
+    this.tickers = newTickers;
   }
 
   /**
@@ -113,7 +140,10 @@ export default class Logic {
     hits.forEach((block: Block) => {
       // increaseScore()
       console.log(block.data.color)
-      block.clearBlockAnimation();
+      this.tickers.push(block)
+      block.destroyed = true;
+      block.hasGravity = true;
+      block.applyForce({ x: 1, y: -10 })
       const blockPos = block.getBoardPos();
       this.boardData[blockPos.y][blockPos.x] = null;
     })

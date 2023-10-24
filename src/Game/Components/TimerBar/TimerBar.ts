@@ -13,7 +13,7 @@ export default class {
   render() {
     const graphics = new Graphics();
     graphics.beginFill(0xffffff);
-    const outer = graphics.drawRoundedRect(0, 0, 100, 30, 20);
+    const outer = graphics.drawRoundedRect(0, 0, 10, 1, .2);
     this.container.addChild(outer);
     return this.container
   }

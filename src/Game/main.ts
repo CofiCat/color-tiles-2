@@ -10,14 +10,14 @@ import TimerBar from "./Components/TimerBar/TimerBar";
 
 
 const height = 15, width = 23;
-const tileWidth = window.innerWidth / 1.2 / width;
+const tileWidth = 1;
 
 const app = new PIXI.Application<HTMLCanvasElement>({
   background: "ffffff",
   antialias: true,
-  // resizeTo: window,
-  width: width * tileWidth,
-  height: height * tileWidth,
+  resizeTo: window,
+  // width: width * tileWidth,
+  // height: height * tileWidth,
   resolution: window.devicePixelRatio,
 
 })
@@ -29,10 +29,7 @@ if (!undoButton) throw new Error('null undo button')
 const htmlContainer = document.getElementById('game-container');
 htmlContainer?.appendChild(app.view);
 
-// app.stage.scale.set(window.innerWidth / 1920);
-
-
-
+app.stage.scale.set(100);
 
 const theme = {
   normal: { primary: 0xeeeeee, secondary: 0xdddddd },
@@ -59,7 +56,7 @@ const undergroundMusic = new Howl({
 undergroundMusic.play();
 // nightMusic.play()
 // Change global volume.
-Howler.volume(.2);
+Howler.volume(0);
 
 //init GAME LOGIC
 const logic = new Logic(height, width, tileWidth);
@@ -80,18 +77,23 @@ const grid = board.createGrid();
 
 undoButton.onclick = () => logic.undo(app.stage)
 
-app.stage.addChild(grid, tiles, timerBar.render());
+app.stage.addChild(grid, tiles);
+// app.stage.addChild(timerBar.render());
 app.stage.addChild(...attackIndicator.render());
 
 
 console.log(logic.getBlockCount())
 
 let mousePos = { x: 0, y: 0 }
+
 app.stage.onmousemove = ((event) => {
-  mousePos.x = event.screenX
-  mousePos.y = event.screenY
+  mousePos.x = event.screenX / app.stage.width * width
+  mousePos.y = event.screenY / app.stage.height * height
 })
+
 app.ticker.add(() => {
+  // console.log(mousePos);
+  logic.tick();
   attackIndicator.update(mousePos)
 }
 );
