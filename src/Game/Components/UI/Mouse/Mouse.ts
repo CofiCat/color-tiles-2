@@ -11,7 +11,7 @@ export default class Mouse {
   init() {
     const graphics = new Graphics();
     graphics.beginFill(0xffffff, 0.5);
-    const circle = graphics.drawCircle(0, 0, 25);
+    const circle = graphics.drawCircle(0, 0, 23);
     this.container.addChild(circle);
     // this.container.scale.set(0.03);
   }

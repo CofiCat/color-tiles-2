@@ -20,7 +20,7 @@ export default class MainMenu {
   init() {
     this.container.eventMode = "dynamic";
     const graphics = new Graphics();
-    graphics.beginFill(0x41b3a3);
+    graphics.beginFill(0x303443);
     const background = graphics.drawRect(0, 0, this.width, this.height);
 
     const titleText = this.createGameNameText();

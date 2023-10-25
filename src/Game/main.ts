@@ -29,9 +29,9 @@ const app = new PIXI.Application<HTMLCanvasElement>({
   resolution: window.devicePixelRatio,
 });
 
-// app.renderer.events.cursorStyles.default = "none";
+app.renderer.events.cursorStyles.default = "none";
 
-const undoButton = document.getElementById("undo")!;
+// const undoButton = document.getElementById("undo")!;
 const htmlContainer = document.getElementById("game")!;
 htmlContainer.appendChild(app.view);
 
@@ -93,7 +93,7 @@ const mouse = new Mouse();
 const tiles = logic.generateTiles();
 const grid = board.createGrid();
 
-undoButton.onclick = () => logic.undo(app.stage);
+// undoButton.onclick = () => logic.undo(app.stage);
 
 const world = new PIXI.Container();
 

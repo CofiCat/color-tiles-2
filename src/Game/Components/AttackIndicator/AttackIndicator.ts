@@ -20,14 +20,16 @@ export default class AttackIndicator {
   gridSnap: boolean;
   tracerRadius: number;
   boardCoords: Coords;
+  scale: number;
   constructor(tileWidth: number, board: Array<Array<Block | null>>) {
     this.container = new Container();
     this.cursor = new Container();
     this.tileWidth = tileWidth;
     this.board = board;
     this.gridSnap = true;
-    this.tracerRadius = 0.15;
+    this.tracerRadius = 1;
     this.boardCoords = { x: 0, y: 0 };
+    this.scale = 0.15;
   }
 
   render() {
@@ -81,10 +83,11 @@ export default class AttackIndicator {
       i++
     ) {
       const circle = graphics.drawCircle(
-        -i * this.tileWidth,
+        -i * this.tileWidth * (1 / this.scale),
         0,
         this.tracerRadius
       );
+      circle.scale.set(this.scale);
       leftContainer.addChild(circle);
     }
     this.container.addChild(leftContainer);
@@ -109,10 +112,11 @@ export default class AttackIndicator {
       i++
     ) {
       const circle = graphics.drawCircle(
-        i * this.tileWidth,
+        i * this.tileWidth * (1 / this.scale),
         0,
         this.tracerRadius
       );
+      circle.scale.set(this.scale);
       rightContainer.addChild(circle);
     }
     this.container.addChild(rightContainer);
@@ -137,10 +141,11 @@ export default class AttackIndicator {
     ) {
       const circle = graphics.drawCircle(
         0,
-        -i * this.tileWidth,
+        -i * this.tileWidth * (1 / this.scale),
         this.tracerRadius
       );
       container.addChild(circle);
+      circle.scale.set(this.scale);
     }
     this.container.addChild(container);
   }
@@ -163,9 +168,10 @@ export default class AttackIndicator {
     ) {
       const circle = graphics.drawCircle(
         0,
-        i * this.tileWidth,
+        i * this.tileWidth * (1 / this.scale),
         this.tracerRadius
       );
+      circle.scale.set(this.scale);
       container.addChild(circle);
     }
     this.container.addChild(container);
