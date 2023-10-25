@@ -53,16 +53,17 @@ const nightMusic = new Howl({
   loop: true,
   volume: 0.6,
 });
+
 const undergroundMusic = new Howl({
   src: ["/sounds/music/underground.wav"],
   loop: true,
 });
 
 // Play the sound.
-// undergroundMusic.play();
-nightMusic.play();
+undergroundMusic.play();
+// nightMusic.play();
 // Change global volume.
-Howler.volume(0);
+Howler.volume(1);
 
 // init Score
 const score = new Score();
