@@ -13,56 +13,34 @@ import Block from "./Components/Block/Block";
 import BlockManifest from "./Components/Block/blockManifest";
 import { clamp } from "./Systems/Mover";
 import { calculateAspectRatioFit } from "./Systems/util";
+import Resizer from "./Systems/Resizer";
 const baseUrl = import.meta.env.BASE_URL;
 //---
 
-const borderRadius = 20 * 2;
-const height = 15,
-  width = 23;
 const tileWidth = 1;
-const maxWidth = screen.width * 0.7;
-const screenRatio = screen.width / (screen.height * 1.1);
 
-console.log(screen.width);
-const windowInset = 0.9;
-let gameWidth = clamp(
-  window.innerWidth * windowInset - borderRadius,
-  0,
-  maxWidth
-);
-const gameDimensions = calculateAspectRatioFit(
-  window.innerWidth * windowInset + borderRadius,
-  (window.innerWidth * windowInset + borderRadius) / screenRatio,
-  // window.innerHeight * windowInset + borderRadius,
-  Math.min(screen.width * 0.7 - borderRadius, window.innerWidth - borderRadius),
-  window.innerHeight * windowInset - borderRadius
-);
+const boardWidth = 23; //tiles
+const boardHeight = 15; //tiles
 
-console.log(gameDimensions);
-
-let gameHeight = gameWidth / screenRatio - borderRadius;
-if (gameHeight > window.innerHeight) {
-  console.log("to adjust", gameHeight - window.innerHeight);
-  // console.log("request resize", window.innerHeight / gameHeight);
-  // const rescale = (window.innerHeight * windowInset) / gameHeight;
-  // console.log("pre", gameWidth);
-  gameWidth -= gameHeight - window.innerHeight - borderRadius;
-  // console.log("updated", gameWidth);
-  gameHeight -= gameHeight - window.innerHeight - borderRadius;
-}
-console.log(gameHeight, window.innerHeight);
-const xDif = gameWidth / screenRatio;
-const scale = gameWidth / 1.2;
+const resizer = new Resizer(boardWidth, boardHeight);
+const dims = resizer.calcResize();
 
 const app = new PIXI.Application<HTMLCanvasElement>({
   background: "ffffff",
   antialias: true,
   // resizeTo: window,
-  width: gameDimensions.width,
-  height: gameDimensions.height,
+  width: dims.width,
+  height: dims.height,
 });
 
-console.log("screen ratio", screenRatio);
+window.addEventListener("resize", () => {
+  const newDims = resizer.calcResize();
+  app.view.width = newDims.width;
+  app.view.height = newDims.height;
+  resizer.rescale();
+});
+
+console.log("screen ratio");
 console.log(
   "app ratio",
   app.screen.width / app.screen.height,
@@ -114,12 +92,12 @@ const score = new Score();
 const timerBar = new TimerBar(60 * 60 * 4, 10);
 
 //init GAME LOGIC
-const logic = new Logic(height, width, tileWidth, score, timerBar);
+const logic = new Logic(boardHeight, boardWidth, tileWidth, score, timerBar);
 
 //init BOARD
 const board = new Board(
-  height,
-  width,
+  boardHeight,
+  boardWidth,
   tileWidth,
   (x: number, y: number) => {
     logic.checkClear(x, y);
@@ -139,6 +117,9 @@ const grid = board.createGrid();
 // undoButton.onclick = () => logic.undo(app.stage);
 
 const world = new PIXI.Container();
+
+resizer.addToRescalers(world);
+
 const UI = new PIXI.Container();
 
 const menu = new MainMenu(app.screen.width, app.screen.height, world);
@@ -152,9 +133,8 @@ const backdrop = graphics.drawRect(0, 0, app.screen.width, app.screen.height);
 backdrop.eventMode = "dynamic";
 background.addChild(backdrop);
 
-world.scale.set(scale / 23);
-console.log(gameWidth);
-const uiScale = gameWidth / screen.width;
+world.scale.set(app.screen.width / 23);
+const uiScale = app.screen.width / screen.width;
 console.log(uiScale);
 // UI.scale.set(uiScale);
 //STAGE
@@ -168,11 +148,11 @@ app.stage.addChild(world);
 UI.addChild(menu.init());
 app.stage.addChild(UI);
 
-mouse.render().scale.set(app.screen.width / maxWidth);
+mouse.render().scale.set(app.screen.width / screen.width);
 app.stage.addChild(mouse.render());
 
-timerBar.getContainer().y = height;
-score.getContainer().y = height;
+timerBar.getContainer().y = boardHeight;
+score.getContainer().y = boardHeight;
 score.getContainer().x = timerBar.getContainer().x + 10;
 logic.addTickers([timerBar, score]);
 
