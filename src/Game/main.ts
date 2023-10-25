@@ -11,24 +11,65 @@ import MainMenu from "./Components/UI/Pages/MainMenu/MainMenu";
 import Mouse from "./Components/UI/Mouse/Mouse";
 import Block from "./Components/Block/Block";
 import BlockManifest from "./Components/Block/blockManifest";
+import { clamp } from "./Systems/Mover";
+import { calculateAspectRatioFit } from "./Systems/util";
 const baseUrl = import.meta.env.BASE_URL;
 //---
 
+const borderRadius = 20 * 2;
 const height = 15,
   width = 23;
 const tileWidth = 1;
-const scale = 80;
-const rendererWidth = width * tileWidth * scale;
-const rendererHeight = height * tileWidth * scale;
+const maxWidth = screen.width * 0.7;
+const screenRatio = screen.width / (screen.height * 1.1);
+
+console.log(screen.width);
+const windowInset = 0.9;
+let gameWidth = clamp(
+  window.innerWidth * windowInset - borderRadius,
+  0,
+  maxWidth
+);
+const gameDimensions = calculateAspectRatioFit(
+  window.innerWidth * windowInset + borderRadius,
+  (window.innerWidth * windowInset + borderRadius) / screenRatio,
+  // window.innerHeight * windowInset + borderRadius,
+  Math.min(screen.width * 0.7 - borderRadius, window.innerWidth - borderRadius),
+  window.innerHeight * windowInset - borderRadius
+);
+
+console.log(gameDimensions);
+
+let gameHeight = gameWidth / screenRatio - borderRadius;
+if (gameHeight > window.innerHeight) {
+  console.log("to adjust", gameHeight - window.innerHeight);
+  // console.log("request resize", window.innerHeight / gameHeight);
+  // const rescale = (window.innerHeight * windowInset) / gameHeight;
+  // console.log("pre", gameWidth);
+  gameWidth -= gameHeight - window.innerHeight - borderRadius;
+  // console.log("updated", gameWidth);
+  gameHeight -= gameHeight - window.innerHeight - borderRadius;
+}
+console.log(gameHeight, window.innerHeight);
+const xDif = gameWidth / screenRatio;
+const scale = gameWidth / 1.2;
 
 const app = new PIXI.Application<HTMLCanvasElement>({
   background: "ffffff",
   antialias: true,
   // resizeTo: window,
-  width: rendererWidth,
-  height: rendererHeight,
-  resolution: window.devicePixelRatio,
+  width: gameDimensions.width,
+  height: gameDimensions.height,
 });
+
+console.log("screen ratio", screenRatio);
+console.log(
+  "app ratio",
+  app.screen.width / app.screen.height,
+  "at:",
+  app.screen.width,
+  app.screen.height
+);
 
 app.renderer.events.cursorStyles.default = "none";
 
@@ -64,7 +105,7 @@ const undergroundMusic = new Howl({
 undergroundMusic.play();
 // nightMusic.play();
 // Change global volume.
-Howler.volume(1);
+Howler.volume(0);
 
 // init Score
 const score = new Score();
@@ -98,20 +139,36 @@ const grid = board.createGrid();
 // undoButton.onclick = () => logic.undo(app.stage);
 
 const world = new PIXI.Container();
+const UI = new PIXI.Container();
 
-const menu = new MainMenu(rendererWidth, rendererHeight, world);
+const menu = new MainMenu(app.screen.width, app.screen.height, world);
 
-world.scale.set(scale);
+const background = new PIXI.Container();
+background.width = app.screen.width;
+background.height = app.screen.height;
+const graphics = new PIXI.Graphics();
+graphics.beginFill(0x111111);
+const backdrop = graphics.drawRect(0, 0, app.screen.width, app.screen.height);
+backdrop.eventMode = "dynamic";
+background.addChild(backdrop);
 
+world.scale.set(scale / 23);
+console.log(gameWidth);
+const uiScale = gameWidth / screen.width;
+console.log(uiScale);
+// UI.scale.set(uiScale);
 //STAGE
+app.stage.addChild(background);
 world.addChild(grid, tiles);
 world.renderable = false;
 world.addChild(...attackIndicator.render());
-app.stage.addChild(score.init());
-app.stage.addChild(timerBar.init());
+UI.addChild(score.init());
+UI.addChild(timerBar.init());
 app.stage.addChild(world);
-app.stage.addChild(menu.init());
+UI.addChild(menu.init());
+app.stage.addChild(UI);
 
+mouse.render().scale.set(app.screen.width / maxWidth);
 app.stage.addChild(mouse.render());
 
 timerBar.getContainer().y = height;
@@ -125,8 +182,12 @@ let mousePos = { x: 0, y: 0 };
 app.stage.onmousemove = (event) => {
   mousePos.x = event.screenX;
   mousePos.y = event.screenY;
-  rescaledMousePos.x = (event.screenX / rendererWidth) * width;
-  rescaledMousePos.y = (event.screenY / rendererHeight) * height;
+  // rescaledMousePos.x = (event.screenX / rendererWidth) * width;
+  // rescaledMousePos.y = (event.screenY / rendererHeight) * height;
+};
+
+world.onmousemove = () => {
+  console.log("mouse omve in world");
 };
 
 app.ticker.add(() => {

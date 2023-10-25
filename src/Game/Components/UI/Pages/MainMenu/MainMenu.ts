@@ -25,15 +25,21 @@ export default class MainMenu {
 
     const titleText = this.createGameNameText();
 
-    const button = new MenuButton("Start Game", 500, 70, () => {
-      console.log("clicked");
-      this.container.renderable = false;
-      this.gameContainer.renderable = true;
-    });
+    const button = new MenuButton(
+      "Start Game",
+      this.width / 2,
+      this.height / 12,
+      this.width / 25,
+      () => {
+        console.log("clicked");
+        this.container.renderable = false;
+        this.gameContainer.renderable = true;
+      }
+    );
 
     const buttonRender = button.render();
-    buttonRender.x = 100;
-    buttonRender.y = 400;
+    buttonRender.x = this.width / 50;
+    buttonRender.y = this.height / 10;
 
     this.container.addChild(background, titleText, buttonRender);
     return this.container;
@@ -47,10 +53,11 @@ export default class MainMenu {
     const container = new Container();
 
     const text = new Text("Color Tiles 2", {
-      fontSize: 32,
+      fontSize: this.width / 20,
     });
 
     container.addChild(text);
+    container.x = this.width / 50;
     // container.scale.set(0.05);
     return container;
   }

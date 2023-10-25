@@ -83,7 +83,7 @@ export default class Mover {
   }
 }
 
-function clamp(val: number, min?: number, max?: number) {
+export function clamp(val: number, min?: number, max?: number) {
   if (min && val < min) {
     return min;
   } else if (max && val > max) {

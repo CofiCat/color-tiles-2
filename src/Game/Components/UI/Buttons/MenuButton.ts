@@ -6,12 +6,20 @@ export default class MenuButton {
   private onClick: Function;
   width: number;
   height: number;
-  constructor(text: string, width: number, height: number, onClick: Function) {
+  fontSize: number;
+  constructor(
+    text: string,
+    width: number,
+    height: number,
+    fontSize: number,
+    onClick: Function
+  ) {
     this.text = text;
     this.onClick = onClick;
     this.container = new Container();
     this.width = width;
     this.height = height;
+    this.fontSize = fontSize;
     this.init();
   }
 
@@ -42,7 +50,7 @@ export default class MenuButton {
     // inner.y = this.height / 2 - inner.height / 2;
 
     const text = new Text(this.text, {
-      fontSize: 50,
+      fontSize: this.fontSize,
     });
 
     text.x = this.width / 2 - text.width / 2;
