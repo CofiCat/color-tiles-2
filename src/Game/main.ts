@@ -11,6 +11,7 @@ import MainMenu from "./Components/UI/Pages/MainMenu/MainMenu";
 import Mouse from "./Components/UI/Mouse/Mouse";
 import Block from "./Components/Block/Block";
 import BlockManifest from "./Components/Block/blockManifest";
+const baseUrl = import.meta.env.BASE_URL;
 //---
 
 const height = 15,
@@ -49,13 +50,13 @@ const curTheme = theme.night;
 
 // Setup the new Howl.
 const nightMusic = new Howl({
-  src: ["/sounds/music/nightMusic.wav"],
+  src: [`${baseUrl}/sounds/music/nightMusic.wav`],
   loop: true,
   volume: 0.6,
 });
 
 const undergroundMusic = new Howl({
-  src: ["/sounds/music/underground.wav"],
+  src: [`${baseUrl}/sounds/music/underground.wav`],
   loop: true,
 });
 

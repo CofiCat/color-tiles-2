@@ -1,72 +1,73 @@
+const base = import.meta.env.BASE_URL;
 const BlockManifest = [
   {
-    path: "/sprites/tile/red.png",
-    color: "red",
+    path: `${base}/sprites/tile/red.png`,
+    color: `red`,
     scale: 0.335,
   },
   {
-    path: "/sprites/tile/orange.png",
-    color: "orange",
+    path: `${base}/sprites/tile/orange.png`,
+    color: `orange`,
     scale: 0.1,
   },
   {
-    path: "/sprites/tile/yellow.png",
-    color: "yellow",
+    path: `${base}/sprites/tile/yellow.png`,
+    color: `yellow`,
     scale: 0.1,
   },
   {
-    path: "/sprites/tile/green.png",
-    color: "green",
+    path: `${base}/sprites/tile/green.png`,
+    color: `green`,
     scale: 0.1,
   },
   {
-    path: "/sprites/tile/blue.png",
-    color: "blue",
+    path: `${base}/sprites/tile/blue.png`,
+    color: `blue`,
     scale: 0.335,
   },
   // {
-  //   path: "/sprites/tile/purple.png",
-  //   color: "green",
+  //   path: `/sprites/tile/purple.png`,
+  //   color: `green`,
   //   scale: .1
   // },
   // {
-  //   path: "/sprites/purple.png",
-  //   color: "purple",
+  //   path: `/sprites/purple.png`,
+  //   color: `purple`,
   //   scale: .335
   // },
   // {
-  //   path: "/sprites/pink.png",
-  //   color: "pink",
+  //   path: `/sprites/pink.png`,
+  //   color: `pink`,
   //   scale: .335
   // },
   // {
-  //   path: "/sprites/orange.png",
-  //   color: "orange",
+  //   path: `/sprites/orange.png`,
+  //   color: `orange`,
   //   scale: .41,
   // },
   // {
-  //   path: "/sprites/brown2.png",
-  //   color: "brown",
+  //   path: `/sprites/brown2.png`,
+  //   color: `brown`,
   //   scale: .41,
   // },
   // {
-  //   path: "/sprites/lime.png",
-  //   color: "lime",
+  //   path: `/sprites/lime.png`,
+  //   color: `lime`,
   //   scale: .41,
   // },
   // {
-  //   path: "/sprites/cyan.png",
-  //   color: "cyan",
+  //   path: `/sprites/cyan.png`,
+  //   color: `cyan`,
   //   scale: .41,
   // },
   // {
-  //   path: "/sprites/yellow.png",
-  //   color: "yellow",
+  //   path: `/sprites/yellow.png`,
+  //   color: `yellow`,
   //   scale: .41,
   // },
   // {
-  //   path: "/sprites/gray.png",
-  //   color: "gray",
+  //   path: `/sprites/gray.png`,
+  //   color: `gray`,
   //   scale: .41,
   // },
 ];

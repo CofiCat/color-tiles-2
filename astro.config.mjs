@@ -5,5 +5,4 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
   site: 'https://josephpanossian.github.io',
   base: '/color-tiles-2',
-  // publicDir: 'public',
 });

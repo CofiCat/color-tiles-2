@@ -7,6 +7,8 @@ import { genRandomCoord, IntersectionChecker } from "./util";
 import type Score from "../Components/Score/Score";
 import type TimerBar from "../Components/TimerBar/TimerBar";
 import { ctx, score } from "../../layouts/ctxStore";
+
+const baseUrl = import.meta.env.BASE_URL;
 //---
 
 export default class Logic {
@@ -192,8 +194,8 @@ export default class Logic {
     if (hits.size > 0) {
       this.moveStack.push(hits);
       const popSound = new Howl({
-        src: ["/sounds/effects/pop.mp3"],
-        volume: 0.1,
+        src: [`${baseUrl}/sounds/effects/pop.mp3`],
+        volume: 0.2,
       });
 
       popSound.play();
