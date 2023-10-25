@@ -7,12 +7,12 @@ export const tiles = [
   {
     path: "/sprites/green3.png",
     color: "green",
-    scale: .1
+    scale: 0.1,
   },
   {
     path: "/sprites/blue2.png",
     color: "blue",
-    scale: .335
+    scale: 0.335,
   },
   // {
   //   path: "/sprites/purple.png",
@@ -22,7 +22,7 @@ export const tiles = [
   {
     path: "/sprites/pink2.png",
     color: "pink",
-    scale: .335
+    scale: 0.335,
   },
   // {
   //   path: "/sprites/orange.png",
@@ -32,12 +32,12 @@ export const tiles = [
   {
     path: "/sprites/brown2.png",
     color: "brown",
-    scale: .41,
+    scale: 0.41,
   },
   {
     path: "/sprites/lime2.png",
     color: "lime",
-    scale: .41,
+    scale: 0.41,
   },
   // {
   //   path: "/sprites/cyan.png",
@@ -54,4 +54,4 @@ export const tiles = [
   //   color: "gray",
   //   scale: .41,
   // },
-]
+];
