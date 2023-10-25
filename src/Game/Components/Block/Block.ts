@@ -4,9 +4,9 @@ import Mover from "../../Systems/Mover";
 
 export default class Block extends Mover {
   private sprite: Sprite;
-  private destroyed: boolean;
+  destroyed: boolean;
   private boardPos: { x: number; y: number };
-  private data: (typeof BlockManifest)[number];
+  data: (typeof BlockManifest)[number];
   private lifetime: number;
 
   constructor(

@@ -3,7 +3,10 @@ import { Container, DisplayObject } from "pixi.js";
 import Block from "../Components/Block/Block";
 import TileManifest from "../Components/Block/blockManifest";
 
-import { genRandomPair, IntersectionChecker } from "./util";
+import { genRandomCoord, IntersectionChecker } from "./util";
+import type Score from "../Components/Score/Score";
+import type TimerBar from "../Components/TimerBar/TimerBar";
+import { ctx, score } from "../../layouts/ctxStore";
 //---
 
 export default class Logic {
@@ -11,17 +14,34 @@ export default class Logic {
   tileWidth: number;
   moveStack: Array<Set<Block>>;
   tickers: Array<any>;
+  score: Score;
+  timer: TimerBar;
+  gameover: boolean;
 
-  constructor(height: number, width: number, tileWidth: number) {
+  constructor(
+    height: number,
+    width: number,
+    tileWidth: number,
+    score: Score,
+    timer: TimerBar
+  ) {
     this.boardData = new Array(height)
       .fill(null)
       .map(() => new Array(width).fill(null));
     this.tileWidth = tileWidth;
     this.moveStack = [];
     this.tickers = [];
+    this.score = score;
+    this.timer = timer;
+    this.gameover = false;
   }
 
   tick() {
+    if (this.timer.hasEnded()) {
+      score.set(this.score.getScore());
+      ctx.set("gameover");
+      this.gameover = true;
+    }
     let toRemove = new Set();
     for (let i = 0; i < this.tickers.length; i++) {
       const cur = this.tickers[i];
@@ -46,6 +66,7 @@ export default class Logic {
     this.tickers = newTickers;
   }
 
+  restart() {}
   /**
    *
    * @returns the active number of Blocks
@@ -88,20 +109,12 @@ export default class Logic {
       // const tileWidth = 75;
       const tileData = TileManifest[i % TileManifest.length];
 
-      const randomPair = genRandomPair(this.boardData);
+      // const randomPair = genRandomPair(this.boardData);
+      const b1 = genRandomCoord(this.boardData);
+      this.setTileAtPos(tileData, b1.x, b1.y, this.tileWidth);
 
-      this.setTileAtPos(
-        tileData,
-        randomPair[0].x,
-        randomPair[0].y,
-        this.tileWidth
-      );
-      this.setTileAtPos(
-        tileData,
-        randomPair[1].x,
-        randomPair[1].y,
-        this.tileWidth
-      );
+      const b2 = genRandomCoord(this.boardData);
+      this.setTileAtPos(tileData, b2.x, b2.y, this.tileWidth);
     }
 
     for (let i = 0; i < this.boardData.length; i++) {
@@ -135,7 +148,12 @@ export default class Logic {
   }
 
   checkClear(x: number, y: number) {
-    if (this.boardData[y][x] != null) return;
+    if (this.gameover) return;
+
+    if (this.boardData[y][x] != null) {
+      this.timer.applyPenalty();
+      return;
+    }
 
     const down = IntersectionChecker.getFirstDown(x, y, this.boardData);
     const up = IntersectionChecker.getFirstUp(x, y, this.boardData);
@@ -177,6 +195,10 @@ export default class Logic {
       });
 
       popSound.play();
+
+      this.score.addPoints(hits.size);
+    } else {
+      this.timer.applyPenalty();
     }
     // if (hits.size === 0) {
     //   progressTimer.value -= 200;
@@ -197,7 +219,7 @@ export default class Logic {
     });
   }
 
-  addTickers(data: [any]) {
+  addTickers(data: Array<any>) {
     this.tickers.push(...data);
   }
 }

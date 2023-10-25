@@ -6,41 +6,46 @@ import { Howl, Howler } from "howler";
 import { mouseCoordinatesToTileIndex } from "./Systems/util";
 import AttackIndicator from "./Components/AttackIndicator/AttackIndicator";
 import TimerBar from "./Components/TimerBar/TimerBar";
+import Score from "./Components/Score/Score";
+import MainMenu from "./Components/UI/Pages/MainMenu/MainMenu";
+import Mouse from "./Components/UI/Mouse/Mouse";
+import Block from "./Components/Block/Block";
+import BlockManifest from "./Components/Block/blockManifest";
 //---
 
 const height = 15,
   width = 23;
 const tileWidth = 1;
-const scale = 100;
+const scale = 80;
 const rendererWidth = width * tileWidth * scale;
 const rendererHeight = height * tileWidth * scale;
 
 const app = new PIXI.Application<HTMLCanvasElement>({
   background: "ffffff",
   antialias: true,
-  // resizeTo: window,
+  resizeTo: window,
   width: rendererWidth,
-  height: rendererHeight * 2,
+  height: rendererHeight,
   resolution: window.devicePixelRatio,
 });
 
-app.renderer.events.cursorStyles.default = "none";
+// app.renderer.events.cursorStyles.default = "none";
 
-const undoButton = document.getElementById("undo");
-if (!undoButton) throw new Error("null undo button");
-const htmlContainer = document.getElementById("game-container");
-htmlContainer?.appendChild(app.view);
+const undoButton = document.getElementById("undo")!;
+const htmlContainer = document.getElementById("game")!;
+htmlContainer.appendChild(app.view);
 
-app.stage.scale.set(100);
+// app.stage.scale.set(1);
 
 const theme = {
-  normal: { primary: 0xeeeeee, secondary: 0xdddddd },
+  light: { primary: 0xeeeeee, secondary: 0xdddddd },
+  dark: { primary: 0x282828, secondary: 0x2f2f2f },
   day: { primary: 0x9adfc3, secondary: 0x92d9be },
   night: { primary: 0x013663, secondary: 0x003059 },
   night2: { primary: 0x013663, secondary: 0x002d53 },
 };
 
-const curTheme = theme.night2;
+const curTheme = theme.dark;
 
 // Setup the new Howl.
 const nightMusic = new Howl({
@@ -54,13 +59,19 @@ const undergroundMusic = new Howl({
 });
 
 // Play the sound.
-undergroundMusic.play();
-// nightMusic.play()
+// undergroundMusic.play();
+nightMusic.play();
 // Change global volume.
 Howler.volume(0);
 
+// init Score
+const score = new Score();
+
+//init Timer Bar
+const timerBar = new TimerBar(60 * 60 * 4, 10);
+
 //init GAME LOGIC
-const logic = new Logic(height, width, tileWidth);
+const logic = new Logic(height, width, tileWidth, score, timerBar);
 
 //init BOARD
 const board = new Board(
@@ -77,34 +88,49 @@ const board = new Board(
 //init ATTACK INDICATOR
 const attackIndicator = new AttackIndicator(tileWidth, logic.boardData);
 
-//init Timer Bar
-const timerBar = new TimerBar(10000, 10);
+//init Mouse
+const mouse = new Mouse();
 const tiles = logic.generateTiles();
 const grid = board.createGrid();
 
 undoButton.onclick = () => logic.undo(app.stage);
 
-app.stage.addChild(grid, tiles);
-app.stage.addChild(...attackIndicator.render());
+const world = new PIXI.Container();
+
+const menu = new MainMenu(rendererWidth, rendererHeight, world);
+
+world.scale.set(scale);
+
+//STAGE
+world.addChild(grid, tiles);
+world.renderable = false;
+world.addChild(...attackIndicator.render());
+app.stage.addChild(score.init());
 app.stage.addChild(timerBar.init());
+app.stage.addChild(world);
+app.stage.addChild(menu.init());
+
+app.stage.addChild(mouse.render());
 
 timerBar.getContainer().y = height;
-logic.addTickers([timerBar]);
-console.log(logic.getBlockCount());
+score.getContainer().y = height;
+score.getContainer().x = timerBar.getContainer().x + 10;
+logic.addTickers([timerBar, score]);
 
+let rescaledMousePos = { x: 0, y: 0 };
 let mousePos = { x: 0, y: 0 };
 
 app.stage.onmousemove = (event) => {
-  mousePos.x = (event.screenX / rendererWidth) * width;
-  mousePos.y = (event.screenY / rendererHeight) * height;
+  mousePos.x = event.screenX;
+  mousePos.y = event.screenY;
+  rescaledMousePos.x = (event.screenX / rendererWidth) * width;
+  rescaledMousePos.y = (event.screenY / rendererHeight) * height;
 };
 
 app.ticker.add(() => {
   logic.tick();
-  attackIndicator.update(mousePos);
+  attackIndicator.update(rescaledMousePos);
+  mouse.update(mousePos);
 });
-app.ticker.start();
 
-// const animate = (time: number) => {
-//   app.ticker.update(time);
-// }
+app.ticker.start();

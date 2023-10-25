@@ -1,6 +1,12 @@
 ---
+import GameOverScreen from "./GameOverScreen.astro";
+import StartMenu from "./StartMenu.astro";
 ---
+
 <div class="game-container" id="game-container">
+  <div class="game" id="game">
+      <!-- <GameOverScreen /> -->
+    </div>
 </div>
 
 <style>
@@ -9,5 +15,40 @@
   align-items: center;
   justify-content: center;
  }
+ #game {
+  /* display: none; */
+  position: relative
+ }
 </style>
+<!-- 
+<script>
+  import {ctx} from "./ctxStore"
+  const game =  document.getElementById('game')!;
+  const menu = document.getElementById('start-menu')!;
+  const gameoverMenu = document.getElementById('game-over')!
+  const startButton = document.getElementById("start-button")!;
+  
+  ctx.subscribe((val) => {
+    if (val === "menu") {
+
+    } else if (val === "game") {
+      menu.style.display = 'none';
+      gameoverMenu.style.display = 'none'
+      game.style.display = "inline"
+
+    } else if (val === "gameover") {
+      gameoverMenu.style.display = 'flex'
+      gameoverMenu.style.top = `${game.clientHeight/2 - gameoverMenu.clientHeight/2}px`
+      gameoverMenu.style.left = `${game.clientWidth/2 - gameoverMenu.clientWidth/2}px`
+    }
+})
+  
+
+  startButton.onclick = (event) => {
+    // console.log("displaying");
+    // game.style.display = 'relative';
+    ctx.set("game");
+  }
+ 
+</script> -->
 <script src="../Game/main.ts"></script>

@@ -3,53 +3,50 @@ import { mouseCoordinatesToTileIndex } from "../../Systems/util";
 import { IntersectionChecker } from "../../Systems/util";
 import type Block from "../Block/Block";
 
-
-type Coords = {
-  x: number,
-  y: number,
-}
+import type { Coords } from "../../types/2d.utils";
 
 /**
  * WHAT THIS NEEDS TO RUN
  * ----------------------
  * 1. mouse position in the world
  * 2. position of first collision on each axis
- * 
+ *
  */
 export default class AttackIndicator {
-  container: Container
-  cursor: Container
-  tileWidth: number
-  board: Array<Array<Block | null>>
-  gridSnap: boolean
-  tracerRadius: number
-  boardCoords: Coords
+  container: Container;
+  cursor: Container;
+  tileWidth: number;
+  board: Array<Array<Block | null>>;
+  gridSnap: boolean;
+  tracerRadius: number;
+  boardCoords: Coords;
   constructor(tileWidth: number, board: Array<Array<Block | null>>) {
     this.container = new Container();
     this.cursor = new Container();
     this.tileWidth = tileWidth;
     this.board = board;
     this.gridSnap = true;
-    this.tracerRadius = .15
-    this.boardCoords = { x: 0, y: 0 }
+    this.tracerRadius = 0.15;
+    this.boardCoords = { x: 0, y: 0 };
   }
 
   render() {
-    const graphics = new Graphics();
-    graphics.beginFill(0xffffff, .5);
-    const circle = graphics.drawCircle(0, 0, 10)
-    circle.scale.set(.03)
-    this.cursor.addChild(circle);
     return [this.container, this.cursor];
   }
 
   update(mouseCoords: Coords) {
-    this.boardCoords = mouseCoordinatesToTileIndex(mouseCoords.x, mouseCoords.y, this.tileWidth);
+    this.boardCoords = mouseCoordinatesToTileIndex(
+      mouseCoords.x,
+      mouseCoords.y,
+      this.tileWidth
+    );
     this.cursor.position.x = mouseCoords.x;
     this.cursor.position.y = mouseCoords.y;
     if (this.gridSnap) {
-      this.container.x = this.boardCoords.x * this.tileWidth + (this.tileWidth / 2)
-      this.container.y = this.boardCoords.y * this.tileWidth + (this.tileWidth / 2)
+      this.container.x =
+        this.boardCoords.x * this.tileWidth + this.tileWidth / 2;
+      this.container.y =
+        this.boardCoords.y * this.tileWidth + this.tileWidth / 2;
     } else {
       this.container.x = mouseCoords.x;
       this.container.y = mouseCoords.y;
@@ -70,13 +67,25 @@ export default class AttackIndicator {
     const leftContainer = new Container();
     const graphics = new Graphics();
     graphics.beginFill(0xffffff);
-    graphics.beginFill(0xffffff, .1);
+    graphics.beginFill(0xffffff, 0.1);
     // console.log(this.boardCoords);
-    let right = IntersectionChecker.getFirstLeft(this.boardCoords.x, this.boardCoords.y, this.board)
+    let right = IntersectionChecker.getFirstLeft(
+      this.boardCoords.x,
+      this.boardCoords.y,
+      this.board
+    );
 
-    for (let i = 1; i < this.boardCoords.x - (right ? right.boardPos.x : -1); i++) {
-      const circle = graphics.drawCircle(-i * this.tileWidth, 0, this.tracerRadius);
-      leftContainer.addChild(circle)
+    for (
+      let i = 1;
+      i < this.boardCoords.x - (right ? right.boardPos.x : -1);
+      i++
+    ) {
+      const circle = graphics.drawCircle(
+        -i * this.tileWidth,
+        0,
+        this.tracerRadius
+      );
+      leftContainer.addChild(circle);
     }
     this.container.addChild(leftContainer);
   }
@@ -85,13 +94,26 @@ export default class AttackIndicator {
     const rightContainer = new Container();
     const graphics = new Graphics();
     graphics.beginFill(0xffffff);
-    graphics.beginFill(0xffffff, .1);
+    graphics.beginFill(0xffffff, 0.1);
 
-    let right = IntersectionChecker.getFirstRight(this.boardCoords.x, this.boardCoords.y, this.board)
+    let right = IntersectionChecker.getFirstRight(
+      this.boardCoords.x,
+      this.boardCoords.y,
+      this.board
+    );
 
-    for (let i = 1; i < (right ? right.boardPos.x : this.board[0].length) - this.boardCoords.x; i++) {
-      const circle = graphics.drawCircle(i * this.tileWidth, 0, this.tracerRadius);
-      rightContainer.addChild(circle)
+    for (
+      let i = 1;
+      i <
+      (right ? right.boardPos.x : this.board[0].length) - this.boardCoords.x;
+      i++
+    ) {
+      const circle = graphics.drawCircle(
+        i * this.tileWidth,
+        0,
+        this.tracerRadius
+      );
+      rightContainer.addChild(circle);
     }
     this.container.addChild(rightContainer);
   }
@@ -100,13 +122,25 @@ export default class AttackIndicator {
     const container = new Container();
     const graphics = new Graphics();
     graphics.beginFill(0xffffff);
-    graphics.beginFill(0xffffff, .1);
+    graphics.beginFill(0xffffff, 0.1);
 
-    let up = IntersectionChecker.getFirstUp(this.boardCoords.x, this.boardCoords.y, this.board)
+    let up = IntersectionChecker.getFirstUp(
+      this.boardCoords.x,
+      this.boardCoords.y,
+      this.board
+    );
 
-    for (let i = 1; i < this.boardCoords.y - (up ? up.getBoardPos().y : -1); i++) {
-      const circle = graphics.drawCircle(0, -i * this.tileWidth, this.tracerRadius);
-      container.addChild(circle)
+    for (
+      let i = 1;
+      i < this.boardCoords.y - (up ? up.getBoardPos().y : -1);
+      i++
+    ) {
+      const circle = graphics.drawCircle(
+        0,
+        -i * this.tileWidth,
+        this.tracerRadius
+      );
+      container.addChild(circle);
     }
     this.container.addChild(container);
   }
@@ -114,13 +148,25 @@ export default class AttackIndicator {
   drawDown(mouseCoords: Coords) {
     const container = new Container();
     const graphics = new Graphics();
-    graphics.beginFill(0xffffff, .1);
+    graphics.beginFill(0xffffff, 0.1);
 
-    let up = IntersectionChecker.getFirstDown(this.boardCoords.x, this.boardCoords.y, this.board)
+    let up = IntersectionChecker.getFirstDown(
+      this.boardCoords.x,
+      this.boardCoords.y,
+      this.board
+    );
 
-    for (let i = 1; i < (up ? up.getBoardPos().y : this.board.length) - this.boardCoords.y; i++) {
-      const circle = graphics.drawCircle(0, i * this.tileWidth, this.tracerRadius);
-      container.addChild(circle)
+    for (
+      let i = 1;
+      i < (up ? up.getBoardPos().y : this.board.length) - this.boardCoords.y;
+      i++
+    ) {
+      const circle = graphics.drawCircle(
+        0,
+        i * this.tileWidth,
+        this.tracerRadius
+      );
+      container.addChild(circle);
     }
     this.container.addChild(container);
   }

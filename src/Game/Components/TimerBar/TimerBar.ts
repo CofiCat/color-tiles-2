@@ -6,6 +6,7 @@ export default class {
   private container: Container;
   private progressContainer: Container;
   private width: number;
+  private penaltyStrength: number;
   // private progressBar: Graphics;
   constructor(maxTime: number, width: number) {
     this.maxTime = maxTime;
@@ -13,6 +14,7 @@ export default class {
     this.container = new Container();
     this.progressContainer = new Container();
     this.width = width;
+    this.penaltyStrength = maxTime / 5;
   }
 
   init() {
@@ -49,5 +51,11 @@ export default class {
   }
   hasEnded() {
     return this.curTime <= 0;
+  }
+  applyPenalty() {
+    this.curTime -= this.penaltyStrength;
+  }
+  reset() {
+    this.curTime = this.maxTime;
   }
 }

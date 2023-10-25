@@ -1,5 +1,7 @@
 ---
 import Game from "../layouts/Game.astro";
+import GameOverScreen from "../layouts/GameOverScreen.astro";
+import StartMenu from "../layouts/StartMenu.astro";
 ---
 
 <html lang="en">
@@ -13,6 +15,7 @@ import Game from "../layouts/Game.astro";
 	<body>
   	<!-- <h1 id="score">0</h1>
 		<progress value="100" max="100" id="progress-timer"></progress> -->
+    <!-- <StartMenu/> -->
 		<Game/>
 		<button id="undo">UNDO</button>
 
@@ -23,5 +26,12 @@ import Game from "../layouts/Game.astro";
  *{
 	padding: 0;
 	margin: 0;
+ }
+ body{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	width: 100vw;
  }
 </style>
