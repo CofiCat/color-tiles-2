@@ -125,6 +125,7 @@ export default class Logic {
         }
       }
     }
+    container.sortableChildren = true;
     return container;
   }
 
@@ -182,6 +183,7 @@ export default class Logic {
       this.tickers.push(block);
       block.destroyed = true;
       block.hasGravity = true;
+      block.getSprite().zIndex = 1000;
       block.applyForce({ x: Math.random() * 5 - 2.5, y: -3 });
       const blockPos = block.getBoardPos();
       this.boardData[blockPos.y][blockPos.x] = null;
