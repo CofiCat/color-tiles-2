@@ -76,6 +76,8 @@ export default class Block extends Mover {
     this.update();
     this.sprite.x = this.pos.x;
     this.sprite.y = this.pos.y;
+    this.sprite.rotation = this.rotation;
+
     if (this.destroyed) {
       this.lifetime -= 1;
       this.clearBlockAnimation();

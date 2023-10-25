@@ -23,7 +23,7 @@ const rendererHeight = height * tileWidth * scale;
 const app = new PIXI.Application<HTMLCanvasElement>({
   background: "ffffff",
   antialias: true,
-  resizeTo: window,
+  // resizeTo: window,
   width: rendererWidth,
   height: rendererHeight,
   resolution: window.devicePixelRatio,
@@ -45,7 +45,7 @@ const theme = {
   night2: { primary: 0x013663, secondary: 0x002d53 },
 };
 
-const curTheme = theme.dark;
+const curTheme = theme.night;
 
 // Setup the new Howl.
 const nightMusic = new Howl({
