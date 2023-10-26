@@ -1,4 +1,3 @@
-import type { intersection } from "astro/zod";
 import { Container, DisplayObject } from "pixi.js";
 
 export default class World {
