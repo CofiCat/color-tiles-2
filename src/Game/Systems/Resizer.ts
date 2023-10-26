@@ -1,6 +1,7 @@
 import type { intersection } from "astro/zod";
 import { calculateAspectRatioFit } from "./util";
 import { Container } from "pixi.js";
+import type { Dimensions } from "../types/2d.utils";
 
 const borderWidth = 20;
 
@@ -12,14 +13,16 @@ const windowInset = 0.9;
 export default class Resizer {
   rescalers: Array<Container>;
   screenRatio: number;
-  curWidth: number;
-  prevWidth: number;
+  curDims: Dimensions;
+  prevDims: Dimensions;
+  prevWindowDims: Dimensions;
 
-  constructor(width: number, height: number) {
+  constructor(width: number, height: number, prevWindowDims: Dimensions) {
     this.rescalers = [];
     this.screenRatio = width / height;
-    this.curWidth = this.calcResize().width;
-    this.prevWidth = this.curWidth;
+    this.curDims = prevWindowDims;
+    this.prevDims = this.curDims;
+    this.prevWindowDims = prevWindowDims;
   }
 
   calcResize() {
@@ -37,8 +40,9 @@ export default class Resizer {
       ),
       window.innerHeight * windowInset - borderRadius
     );
-    this.prevWidth = this.curWidth;
-    this.curWidth = newDims.width;
+    console.log("prev dims", this.prevDims);
+    this.prevDims = this.curDims;
+    this.curDims = newDims;
     return newDims;
   }
 
@@ -47,15 +51,59 @@ export default class Resizer {
   }
 
   rescale() {
-    if (this.curWidth === this.prevWidth) return;
+    console.log("before", this.prevDims, this.curDims, {
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+    this.curDims.width = window.innerWidth;
+    this.curDims.height = window.innerHeight;
+    console.log("after", this.prevDims, this.curDims, {
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+    if (this.calcAspect(this.curDims) === this.calcAspect(this.prevDims)) {
+      console.log("is ZOOM");
+      console.log(this.curDims, this.prevDims);
+    } else {
+      console.log(
+        "is NOT zoom",
+        this.calcAspect(this.curDims),
+        this.calcAspect(this.prevDims)
+      );
+      console.log(" not zoom");
+    }
 
-    const rescaleAmount = this.curWidth / this.prevWidth;
+    this.prevDims.width = this.curDims.width;
+    this.prevDims.height = this.curDims.height;
+    return;
+
+    const rescaleXAmount = this.curDims.width / this.prevDims.width;
+    const rescaleYAmount = this.curDims.height / this.prevDims.height;
     this.rescalers.forEach((container) => {
       const curScaleX = container.scale.x;
       const curScaleY = container.scale.y;
 
-      container.scale.x = curScaleX * rescaleAmount;
-      container.scale.y = curScaleX * rescaleAmount;
+      console.log("scale factor", rescaleXAmount);
+      container.scale.x = curScaleX * rescaleXAmount;
+      container.scale.y = curScaleX * rescaleYAmount;
     });
+  }
+
+  hasResized(curWindowDims: Dimensions) {
+    let res;
+    if (
+      curWindowDims.width !== this.prevWindowDims.width ||
+      curWindowDims.height !== this.prevWindowDims.height
+    ) {
+      res = true;
+    } else {
+      res = false;
+    }
+    this.prevWindowDims = curWindowDims;
+    return res;
+  }
+
+  calcAspect(dims: Dimensions) {
+    return dims.width / dims.height;
   }
 }

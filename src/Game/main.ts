@@ -9,11 +9,8 @@ import TimerBar from "./Components/TimerBar/TimerBar";
 import Score from "./Components/Score/Score";
 import MainMenu from "./Components/UI/Pages/MainMenu/MainMenu";
 import Mouse from "./Components/UI/Mouse/Mouse";
-import Block from "./Components/Block/Block";
-import BlockManifest from "./Components/Block/blockManifest";
-import { clamp } from "./Systems/Mover";
-import { calculateAspectRatioFit } from "./Systems/util";
 import Resizer from "./Systems/Resizer";
+
 const baseUrl = import.meta.env.BASE_URL;
 //---
 
@@ -22,7 +19,11 @@ const tileWidth = 1;
 const boardWidth = 20; //tiles
 const boardHeight = 14; //tiles
 
-const resizer = new Resizer(boardWidth, boardHeight);
+console.log("window", window.innerWidth);
+const resizer = new Resizer(boardWidth, boardHeight, {
+  width: window.innerWidth,
+  height: window.innerHeight,
+});
 const dims = resizer.calcResize();
 
 const app = new PIXI.Application<HTMLCanvasElement>({
@@ -33,13 +34,16 @@ const app = new PIXI.Application<HTMLCanvasElement>({
   height: dims.height,
 });
 
-window.addEventListener("resize", () => {
+const rescale = () => {
   console.log("resize");
+  console.log(document.getElementById("game")?.clientWidth);
   const newDims = resizer.calcResize();
   app.view.width = newDims.width;
   app.view.height = newDims.height;
-  resizer.rescale();
-});
+  // resizer.rescale();
+};
+
+// window.addEventListener("resize", rescale);
 
 console.log("screen ratio");
 console.log(
@@ -178,6 +182,12 @@ app.ticker.add((_delta) => {
   logic.tick();
   attackIndicator.update(rescaledMousePos);
   mouse.update(mousePos);
+  if (
+    resizer.hasResized({ width: window.innerWidth, height: window.innerHeight })
+  ) {
+    console.log("resized");
+    resizer.rescale();
+  }
 });
 
 app.ticker.start();
