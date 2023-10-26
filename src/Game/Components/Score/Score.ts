@@ -8,7 +8,6 @@ export default class Score {
     this.score = 0;
     this.prevScore = this.score;
     this.container = new Container();
-    this.container.scale.set(0.02);
   }
 
   init() {
@@ -26,6 +25,7 @@ export default class Score {
     this.container.removeChildren();
     const text = new Text(`Score: ${this.score}`, {
       fontSize: 24,
+      fill: 0xffffff,
       // align: "right",
     });
     this.container.addChild(text);

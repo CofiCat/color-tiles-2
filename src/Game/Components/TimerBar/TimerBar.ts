@@ -7,22 +7,28 @@ export default class {
   private progressContainer: Container;
   private width: number;
   private penaltyStrength: number;
+  private height: number;
   // private progressBar: Graphics;
-  constructor(maxTime: number, width: number) {
+  constructor(maxTime: number, width: number, height: number) {
     this.maxTime = maxTime;
     this.curTime = maxTime;
     this.container = new Container();
     this.progressContainer = new Container();
     this.width = width;
+    this.height = height;
     this.penaltyStrength = maxTime / 5;
+    this.init();
   }
 
   init() {
     const graphics = new Graphics();
     graphics.beginFill(0x222222);
-    const outer = graphics.drawRoundedRect(0, 0, this.width, 0.5, 0.2);
+    const outer = graphics.drawRoundedRect(0, 0, this.width, this.height, 0.2);
     this.drawProgress();
     this.container.addChild(outer, this.progressContainer);
+  }
+
+  render() {
     return this.container;
   }
 
@@ -38,7 +44,13 @@ export default class {
 
     const graphics = new Graphics();
     graphics.beginFill(0x444444);
-    const progress = graphics.drawRoundedRect(0, 0, remainder, 0.5, 0.2);
+    const progress = graphics.drawRoundedRect(
+      0,
+      0,
+      remainder,
+      this.height,
+      0.2
+    );
     this.progressContainer.addChild(progress);
   }
 

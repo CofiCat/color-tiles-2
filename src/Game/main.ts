@@ -88,8 +88,11 @@ Howler.volume(0);
 // init Score
 const score = new Score();
 
+const UI = new PIXI.Container();
+UI.width = dims.width;
+
 //init Timer Bar
-const timerBar = new TimerBar(60 * 60 * 4, 10);
+const timerBar = new TimerBar(10000, dims.width * 0.8, dims.height / 10 / 2);
 
 //init GAME LOGIC
 const logic = new Logic(boardHeight, boardWidth, tileWidth, score, timerBar);
@@ -118,9 +121,7 @@ const grid = board.createGrid();
 
 const world = new PIXI.Container();
 
-resizer.addToRescalers(world);
-
-const UI = new PIXI.Container();
+resizer.addToRescalers(world, UI);
 
 const menu = new MainMenu(app.screen.width, app.screen.height, world);
 
@@ -142,8 +143,8 @@ app.stage.addChild(background);
 world.addChild(grid, tiles);
 world.renderable = false;
 world.addChild(...attackIndicator.render());
+UI.addChild(timerBar.render());
 UI.addChild(score.init());
-UI.addChild(timerBar.init());
 app.stage.addChild(world);
 UI.addChild(menu.init());
 app.stage.addChild(UI);
@@ -151,9 +152,13 @@ app.stage.addChild(UI);
 mouse.render().scale.set(app.screen.width / screen.width);
 app.stage.addChild(mouse.render());
 
-timerBar.getContainer().y = boardHeight;
-score.getContainer().y = boardHeight;
-score.getContainer().x = timerBar.getContainer().x + 10;
+timerBar.getContainer().y =
+  dims.height - timerBar.render().height / 2 - dims.height / 10 / 2;
+timerBar.render().x = dims.width / 30;
+score.getContainer().y =
+  dims.height - score.getContainer().height / 2 - dims.height / 10 / 2;
+
+score.getContainer().x = timerBar.render().x + timerBar.render().width + 10;
 logic.addTickers([timerBar, score]);
 
 let rescaledMousePos = { x: 0, y: 0 };
@@ -170,7 +175,7 @@ world.onmousemove = () => {
   console.log("mouse omve in world");
 };
 
-app.ticker.add(() => {
+app.ticker.add((_delta) => {
   logic.tick();
   attackIndicator.update(rescaledMousePos);
   mouse.update(mousePos);
