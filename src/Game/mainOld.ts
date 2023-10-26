@@ -1,12 +1,12 @@
 //---
 import * as PIXI from "pixi.js";
 import Board from "./Components/Board/Board";
-import Logic from "./Systems/Logic";
+import Logic from "./Systems/LogicController";
 import { Howl, Howler } from "howler";
 import { mouseCoordinatesToTileIndex } from "./Systems/util";
 import AttackIndicator from "./Components/AttackIndicator/AttackIndicator";
 import TimerBar from "./Components/TimerBar/TimerBar";
-import Score from "./Components/Score/Score";
+import Score from "./Components/UI/Score/Score";
 import MainMenu from "./Components/UI/Pages/MainMenu/MainMenu";
 import Mouse from "./Components/UI/Mouse/Mouse";
 import Resizer from "./Systems/Resizer";

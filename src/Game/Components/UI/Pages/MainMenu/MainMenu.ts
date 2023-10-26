@@ -1,19 +1,24 @@
-import { Container, DisplayObject, Graphics, Text } from "pixi.js";
+import { Application, Container, DisplayObject, Graphics, Text } from "pixi.js";
 import MenuButton from "../../Buttons/MenuButton";
 import type { Dimensions } from "../../../../types/2d.utils";
 import type { Context } from "../../../../Systems/ContextManager";
+import type ContextManager from "../../../../Systems/ContextManager";
 
 export default class MainMenu {
   container: Container;
   dims: Dimensions;
-  setContext: (context: Context) => void;
-  constructor(dims: Dimensions, setContext: (context: Context) => void) {
+  app: Application;
+  context: ContextManager;
+  constructor(dims: Dimensions, app: Application, context: ContextManager) {
+    this.app = app;
     this.container = new Container();
-    this.setContext = setContext;
     this.dims = dims;
+    this.context = context;
+    this.init();
   }
 
   init() {
+    this.container.name = "MainMenu";
     this.container.eventMode = "dynamic";
     const graphics = new Graphics();
     graphics.beginFill(0x303443);
@@ -33,8 +38,8 @@ export default class MainMenu {
       this.dims.width / 25,
       () => {
         console.log("clicked");
+        this.context.setContext("ActiveGame");
         // this.container.renderable = false;
-        this.setContext("ActiveGame");
       }
     );
 
@@ -48,6 +53,16 @@ export default class MainMenu {
 
   render() {
     return this.container;
+  }
+
+  destroy() {
+    const ctx = this.app.stage.getChildByName("MainMenu");
+    if (ctx) {
+      console.log("destroying main menu");
+      this.app.stage.removeChild(ctx);
+    } else {
+      console.log("could not find main menu");
+    }
   }
 
   createGameNameText() {

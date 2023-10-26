@@ -1,17 +1,20 @@
 //---
-import { Container, DisplayObject } from "pixi.js";
+import { Container, curves, DisplayObject } from "pixi.js";
 import Block from "../Components/Block/Block";
 import TileManifest from "../Components/Block/blockManifest";
 
 import { genRandomCoord, IntersectionChecker } from "./util";
-import type Score from "../Components/Score/Score";
+import type Score from "../Components/UI/Score/Score";
 import type TimerBar from "../Components/TimerBar/TimerBar";
 import { ctx, score } from "../../layouts/ctxStore";
+import type { Dimensions } from "../types/2d.utils";
+
+import { Howl } from "howler";
 
 const baseUrl = import.meta.env.BASE_URL;
 //---
 
-export default class Logic {
+export default class LogicController {
   boardData: Array<Array<null | Block>>;
   tileWidth: number;
   moveStack: Array<Set<Block>>;
@@ -22,15 +25,14 @@ export default class Logic {
   numTiles: number;
 
   constructor(
-    height: number,
-    width: number,
+    boardDims: Dimensions,
     tileWidth: number,
     score: Score,
     timer: TimerBar
   ) {
-    this.boardData = new Array(height)
+    this.boardData = new Array(boardDims.height)
       .fill(null)
-      .map(() => new Array(width).fill(null));
+      .map(() => new Array(boardDims.width).fill(null));
     this.tileWidth = tileWidth;
     this.moveStack = [];
     this.tickers = [];
@@ -38,7 +40,7 @@ export default class Logic {
     this.timer = timer;
     this.gameover = false;
     const blockDensity = 0.8;
-    this.numTiles = Math.round(height * width * 0.8);
+    this.numTiles = Math.round(boardDims.height * boardDims.width * 0.8);
   }
 
   tick() {
@@ -47,9 +49,9 @@ export default class Logic {
       ctx.set("gameover");
       this.gameover = true;
     }
+    // return;
     let toRemove = new Set();
-    for (let i = 0; i < this.tickers.length; i++) {
-      const cur = this.tickers[i];
+    this.tickers.forEach((cur, i) => {
       if (cur.hasLifetime()) {
         if (cur.getLifetime() > 0) {
           cur.tick();
@@ -59,15 +61,15 @@ export default class Logic {
       } else {
         cur.tick();
       }
-    }
+    });
     if (toRemove.size === 0) return;
 
-    let newTickers = [];
-    for (let i = 0; i < this.tickers.length; i++) {
+    let newTickers = <Array<any>>[];
+    this.tickers.forEach((cur, i) => {
       if (!toRemove.has(i)) {
         newTickers.push(this.tickers[i]);
       }
-    }
+    });
     this.tickers = newTickers;
   }
 

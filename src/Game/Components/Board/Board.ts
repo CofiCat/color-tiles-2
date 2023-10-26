@@ -1,33 +1,33 @@
 import { Graphics, Container } from "pixi.js";
+import type { Dimensions } from "../../types/2d.utils";
 
 export default class Board {
-  height: number;
-  width: number;
+  dims: Dimensions;
   tileWidth: number;
   handleTileClick: Function;
   colorPrim: number;
   colorOff: number;
+  container: any;
 
   constructor(
-    boardHeight: number,
-    boardWidth: number,
+    dims: Dimensions,
     tileWidth: number,
     handleTileClick: Function,
     colorPrim: number,
     colorOff: number
   ) {
-    this.height = boardHeight;
-    this.width = boardWidth;
+    this.dims = dims;
     this.tileWidth = tileWidth;
     this.handleTileClick = handleTileClick;
     this.colorPrim = colorPrim;
     this.colorOff = colorOff;
+    this.container = new Container();
+    this.init();
   }
 
-  createGrid(): Container {
-    const container = new Container();
-    for (let y = 0; y < this.height; y++) {
-      for (let x = 0; x < this.width; x++) {
+  init() {
+    for (let y = 0; y < this.dims.height; y++) {
+      for (let x = 0; x < this.dims.width; x++) {
         const graphics = new Graphics();
         if ((x + y) % 2 === 1) graphics.beginFill(this.colorPrim);
         else graphics.beginFill(this.colorOff);
@@ -42,9 +42,12 @@ export default class Board {
         rect.onpointerdown = (event) => {
           this.handleTileClick(x, y);
         };
-        container.addChild(rect);
+        this.container.addChild(rect);
       }
     }
-    return container;
+  }
+
+  render() {
+    return this.container;
   }
 }

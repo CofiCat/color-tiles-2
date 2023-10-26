@@ -1,36 +1,44 @@
 import type { Application } from "pixi.js";
 import MainMenu from "../Components/UI/Pages/MainMenu/MainMenu";
+import ActiveGame from "../Components/UI/Pages/ActiveGame";
+import type Renderer from "./Renderer";
 
-export type Context = "MainMenu" | "ActiveGame" | "PauseMenu" | "GameOver";
+export type Context =
+  | "MainMenu"
+  | "ActiveGame"
+  | "PauseMenu"
+  | "GameOver"
+  | null;
 
 export default class ContextManager {
   context: Context;
   app: Application;
-  constructor(app: Application) {
+  mainMenu: MainMenu;
+  activeGame: ActiveGame;
+  renderer: Renderer;
+  constructor(app: Application, renderer: Renderer) {
     this.app = app;
-    this.context = "MainMenu";
-    this.initMainMenu();
+    this.context = null;
+    this.mainMenu = this.initMainMenu();
+    this.renderer = renderer;
+    this.activeGame = new ActiveGame(this.app, this.renderer);
+    this.renderer = renderer;
+    this.setContext("MainMenu");
   }
-
   setContext(newContext: Context) {
+    console.log(this.app);
     if (this.context === newContext) return;
-    const mainMenu = this.app.stage.getChildByName("MainMenu");
-    const activeGame = this.app.stage.getChildByName("ActiveGame");
-    const pauseMenu = this.app.stage.getChildByName("PauseMenu");
-    const gameOver = this.app.stage.getChildByName("GameOver");
-
+    this.context = newContext;
     if (this.context === "MainMenu") {
-      if (activeGame) {
-        this.app.stage.removeChild(activeGame);
-      }
-      if (pauseMenu) {
-        this.app.stage.removeChild(pauseMenu);
-      }
-      if (gameOver) {
-        this.app.stage.removeChild(gameOver);
-      }
-
-      this.initMainMenu();
+      this.mainMenu = this.initMainMenu();
+      this.app.stage.addChild(this.mainMenu.render());
+    }
+    if (this.context === "ActiveGame") {
+      this.mainMenu.destroy();
+      this.activeGame = new ActiveGame(this.app, this.renderer);
+      this.app.stage.addChild(this.activeGame.render());
+      console.log(this.app.stage);
+      console.log("rendering active game");
     }
   }
 
@@ -40,10 +48,10 @@ export default class ContextManager {
         width: this.app.view.width,
         height: this.app.view.height,
       },
-      this.setContext
+      this.app,
+      this
     );
-    console.log("rendering main menu");
-    this.app.stage.addChild(mainMenu.render());
+    return mainMenu;
   }
 
   private destoryMainMenu() {}
