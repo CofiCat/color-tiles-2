@@ -19,8 +19,8 @@ const baseUrl = import.meta.env.BASE_URL;
 
 const tileWidth = 1;
 
-const boardWidth = 23; //tiles
-const boardHeight = 15; //tiles
+const boardWidth = 20; //tiles
+const boardHeight = 14; //tiles
 
 const resizer = new Resizer(boardWidth, boardHeight);
 const dims = resizer.calcResize();
@@ -133,7 +133,7 @@ const backdrop = graphics.drawRect(0, 0, app.screen.width, app.screen.height);
 backdrop.eventMode = "dynamic";
 background.addChild(backdrop);
 
-world.scale.set(app.screen.width / 23);
+world.scale.set(app.screen.width / boardWidth);
 const uiScale = app.screen.width / screen.width;
 console.log(uiScale);
 // UI.scale.set(uiScale);

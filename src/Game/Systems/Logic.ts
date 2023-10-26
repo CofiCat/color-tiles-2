@@ -19,6 +19,7 @@ export default class Logic {
   score: Score;
   timer: TimerBar;
   gameover: boolean;
+  numTiles: number;
 
   constructor(
     height: number,
@@ -36,6 +37,8 @@ export default class Logic {
     this.score = score;
     this.timer = timer;
     this.gameover = false;
+    const blockDensity = 0.8;
+    this.numTiles = Math.round(height * width * 0.8);
   }
 
   tick() {
@@ -105,7 +108,7 @@ export default class Logic {
   generateTiles() {
     this.clearBoardData();
 
-    const numPairs = 100;
+    const numPairs = Math.round(this.numTiles / 2);
     const container = new Container();
     for (let i = 0; i < numPairs; i++) {
       // const tileWidth = 75;
