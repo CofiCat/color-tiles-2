@@ -16,7 +16,7 @@ export default class {
     this.progressContainer = new Container();
     this.width = width;
     this.height = height;
-    this.penaltyStrength = maxTime / 5;
+    this.penaltyStrength = this.maxTime / 10;
     this.init();
   }
 

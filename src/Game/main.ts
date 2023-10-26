@@ -34,6 +34,7 @@ const app = new PIXI.Application<HTMLCanvasElement>({
 });
 
 window.addEventListener("resize", () => {
+  console.log("resize");
   const newDims = resizer.calcResize();
   app.view.width = newDims.width;
   app.view.height = newDims.height;
@@ -171,9 +172,7 @@ app.stage.onmousemove = (event) => {
   // rescaledMousePos.y = (event.screenY / rendererHeight) * height;
 };
 
-world.onmousemove = () => {
-  console.log("mouse omve in world");
-};
+world.onmousemove = () => {};
 
 app.ticker.add((_delta) => {
   logic.tick();
