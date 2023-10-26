@@ -26,7 +26,7 @@ export default class MenuButton {
   init() {
     const graphics = new Graphics();
     this.container.eventMode = "dynamic";
-    this.container.onclick = () => this.onClick();
+    this.container.onpointertap = () => this.onClick();
     const borderRadius = 20;
 
     graphics.beginFill(0x111111);
