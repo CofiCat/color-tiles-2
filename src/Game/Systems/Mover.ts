@@ -34,19 +34,18 @@ export default class Mover {
     this.rotation = rotation ?? 0;
   }
 
-  update() {
+  update(deltaTime: number) {
     this.acceleration.y += this.hasGravity ? gravity : 0;
 
-    this.velocity.x += this.acceleration.x;
-    this.velocity.y += this.acceleration.y;
+    this.velocity.x += this.acceleration.x * deltaTime;
+    this.velocity.y += this.acceleration.y * deltaTime;
     this.velocity.x = clamp(this.velocity.x, -2, 2);
     this.velocity.x = clamp(this.velocity.x, -2, 2);
 
-    this.velocity.x;
     this.pos.x += this.velocity.x;
     this.pos.y += this.velocity.y;
 
-    this.rotation += this.velocity.x / 5;
+    this.rotation += (this.velocity.x / 5) * deltaTime;
     //REFACTOR FUTURE
     //----------
 

@@ -32,8 +32,8 @@ export default class {
     return this.container;
   }
 
-  tick() {
-    this.curTime -= 1;
+  tick(deltaTime: number) {
+    this.curTime -= 1 * deltaTime;
     this.drawProgress();
   }
 
