@@ -1,12 +1,14 @@
 import { Container, Graphics, Text } from "pixi.js";
+import SoundManager from "../../../Systems/SoundManager";
 
 export default class MenuButton {
-  private container: Container;
-  private text: string;
-  private onClick: Function;
   width: number;
   height: number;
   fontSize: number;
+  private text: string;
+  private container: Container;
+  private onClick: Function;
+  soundManager: SoundManager;
   constructor(
     text: string,
     width: number,
@@ -16,17 +18,21 @@ export default class MenuButton {
   ) {
     this.text = text;
     this.onClick = onClick;
-    this.container = new Container();
     this.width = width;
     this.height = height;
     this.fontSize = fontSize;
+    this.container = new Container();
+    this.soundManager = new SoundManager();
     this.init();
   }
 
   init() {
     const graphics = new Graphics();
     this.container.eventMode = "dynamic";
-    this.container.onpointertap = () => this.onClick();
+    this.container.onpointertap = () => {
+      this.soundManager.effects.tap();
+      this.onClick();
+    };
     const borderRadius = 20;
 
     graphics.beginFill(0x111111);

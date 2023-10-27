@@ -18,32 +18,34 @@ const effects = {
   swish: {
     path: effectsBasePath + "swish.mp3",
   },
+  tap: {
+    path: effectsBasePath + "tap.mp3",
+  },
 };
 
 class Effects {
   constructor() {}
 
-  pop() {
+  play(path: string, volume: number) {
     const sound = new Howl({
-      src: [effects.pop.path],
-      volume: 0.2,
-    });
-    sound.play();
-  }
-
-  punch() {
-    const sound = new Howl({
-      src: [effects.punch.path],
-      volume: 0.1,
-    });
-    sound.play();
-  }
-
-  swish() {
-    const sound = new Howl({
-      src: [effects.swish.path],
+      src: [path],
       volume: 0.3,
     });
     sound.play();
+  }
+  pop() {
+    this.play(effects.pop.path, 0.2);
+  }
+
+  punch() {
+    this.play(effects.punch.path, 0.1);
+  }
+
+  swish() {
+    this.play(effects.swish.path, 0.3);
+  }
+
+  tap() {
+    this.play(effects.tap.path, 0.4);
   }
 }
