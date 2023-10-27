@@ -5,6 +5,7 @@ import TimerBar from "../../TimerBar/TimerBar";
 import type { Dimensions } from "../../../types/2d.utils";
 import Board from "../../Board/Board";
 import type Renderer from "../../../Systems/Renderer";
+import type ContextManager from "../../../Systems/ContextManager";
 
 const theme = {
   light: { primary: 0xeeeeee, secondary: 0xdddddd },
@@ -26,7 +27,9 @@ export default class ActiveGame {
   boardDims: Dimensions;
   board: Board;
   renderer: Renderer;
-  constructor(app: Application, renderer: Renderer) {
+  context: ContextManager;
+  constructor(app: Application, renderer: Renderer, context: ContextManager) {
+    this.context = context;
     this.renderer = renderer;
     this.container = new Container();
     this.app = app;
@@ -35,18 +38,18 @@ export default class ActiveGame {
       height: this.app.view.height,
     };
     this.boardDims = { width: 20, height: 14 };
-    this.score = new Score();
+    this.score = new Score(this.app);
     this.timer = new TimerBar(
-      10000,
+      20000,
       this.sceneDims.width * 0.8,
       this.sceneDims.height / 10 / 2
     );
-    console.log("scene", this.sceneDims);
     this.logicController = new LogicController(
       this.boardDims,
       1,
       this.score,
-      this.timer
+      this.timer,
+      this.context
     );
     this.board = new Board(
       this.boardDims,
@@ -80,28 +83,39 @@ export default class ActiveGame {
 
     // fix timer to bottom
     this.timer.render().y =
-      this.sceneDims.height -
-      this.timer.render().height / 2 -
-      this.sceneDims.height / 10 / 2;
+      world.height +
+      this.timer.render().height / 1.25 -
+      (this.sceneDims.height - world.height) / 2;
     this.timer.render().x = this.sceneDims.width / 30;
 
     // fix score to right of timer
-    this.score.getContainer().y =
-      this.sceneDims.height -
-      this.score.getContainer().height / 2 -
-      this.sceneDims.height / 10 / 2;
+    this.score.render().y =
+      this.timer.render().y + this.score.render().height / 4;
 
     this.score.getContainer().x =
       this.timer.render().x + this.timer.render().width + 10;
 
-    this.renderer.addUpdatable(this.score, this.timer, this.logicController);
+    this.renderer.addUpdatable(this.logicController, this.score, this.timer);
   }
 
   destroy() {
-    const ctx = this.app.stage.getChildByName("ActiveGame");
-    if (ctx) {
-      this.app.stage.removeChild(ctx);
-    }
+    // const ctx = this.app.stage.getChildByName("ActiveGame");
+    this.container.destroy({
+      children: true,
+      texture: true,
+      baseTexture: true,
+    });
+
+    this.renderer.popUpdatable();
+    this.renderer.popUpdatable();
+    this.renderer.popUpdatable();
+    // if (ctx) {
+    //   this.app.stage.removeChild(ctx);
+    // }
+  }
+
+  getScore() {
+    return this.score.getScore();
   }
 
   render() {

@@ -1,13 +1,15 @@
-import { Container, BitmapText, Text } from "pixi.js";
+import { Container, BitmapText, Text, Application } from "pixi.js";
 
 export default class Score {
   private score: number;
   private prevScore: number;
   private container: Container;
-  constructor() {
+  private app: Application;
+  constructor(app: Application) {
     this.score = 0;
     this.prevScore = this.score;
     this.container = new Container();
+    this.app = app;
   }
 
   init() {
@@ -24,7 +26,7 @@ export default class Score {
   update() {
     this.container.removeChildren();
     const text = new Text(`Score: ${this.score}`, {
-      fontSize: 24,
+      fontSize: this.app.screen.width / 40,
       fill: 0xffffff,
       // align: "right",
     });
@@ -46,5 +48,9 @@ export default class Score {
 
   getScore() {
     return this.score;
+  }
+
+  render() {
+    return this.container;
   }
 }

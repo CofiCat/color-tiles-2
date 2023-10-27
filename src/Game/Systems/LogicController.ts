@@ -10,6 +10,7 @@ import { ctx, score } from "../../layouts/ctxStore";
 import type { Dimensions } from "../types/2d.utils";
 
 import { Howl } from "howler";
+import type ContextManager from "./ContextManager";
 
 const baseUrl = import.meta.env.BASE_URL;
 //---
@@ -23,13 +24,16 @@ export default class LogicController {
   timer: TimerBar;
   gameover: boolean;
   numTiles: number;
+  context: ContextManager;
 
   constructor(
     boardDims: Dimensions,
     tileWidth: number,
     score: Score,
-    timer: TimerBar
+    timer: TimerBar,
+    context: ContextManager
   ) {
+    this.context = context;
     this.boardData = new Array(boardDims.height)
       .fill(null)
       .map(() => new Array(boardDims.width).fill(null));
@@ -44,10 +48,12 @@ export default class LogicController {
   }
 
   tick() {
+    if (this.context.getContext() === "GameOver") return;
     if (this.timer.hasEnded()) {
       score.set(this.score.getScore());
-      ctx.set("gameover");
       this.gameover = true;
+      console.log("timer has ended", this.timer);
+      this.context.setContext("GameOver");
     }
     // return;
     let toRemove = new Set();

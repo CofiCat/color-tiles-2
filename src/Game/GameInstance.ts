@@ -24,6 +24,14 @@ export default class GameInstance {
   createApp() {
     const parent = document.getElementById(this.domParentId);
     if (!parent) throw new Error("failed to get parent element");
+    const aspectRatio = 20 / 15;
+    const widthInset = 1;
+    const width = Math.min(window.innerHeight, window.innerWidth / widthInset);
+    const height = width / aspectRatio;
+    parent.style.width = `${width}px`;
+    parent.style.height = `${height}px`;
+    parent.style.maxWidth = `${window.innerHeight}px`;
+    parent.style.maxHeight = `${Math.min(window.innerWidth, height)}px`;
 
     const app = new Application<HTMLCanvasElement>({
       background: "ffffff",
@@ -38,7 +46,9 @@ export default class GameInstance {
     parent.appendChild(app.view);
     window.addEventListener("resize", () => {
       console.log("resized");
-      app.resize();
+      // parent.style.width = `${window.innerWidth / widthInset}px`;
+      // parent.style.height = `${window.innerWidth / aspectRatio / widthInset}px`;
+      // app.resize();
     });
     return app;
   }
@@ -59,6 +69,8 @@ export default class GameInstance {
     this.app.stage.addChild(background, mouse.render());
     return { mouse, background };
   }
+
+  gameOverHandler() {}
 
   initContext() {}
 }

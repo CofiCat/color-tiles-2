@@ -20,4 +20,8 @@ export default class Renderer {
   addUpdatable(...args: any) {
     args.forEach((val: any) => this.updatables.push(val));
   }
+
+  popUpdatable() {
+    this.updatables.pop();
+  }
 }

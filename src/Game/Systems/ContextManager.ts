@@ -2,6 +2,7 @@ import type { Application } from "pixi.js";
 import MainMenu from "../Components/UI/Pages/MainMenu/MainMenu";
 import ActiveGame from "../Components/UI/Pages/ActiveGame";
 import type Renderer from "./Renderer";
+import GameOver from "../Components/UI/GameOver/GameOver";
 
 export type Context =
   | "MainMenu"
@@ -16,29 +17,35 @@ export default class ContextManager {
   mainMenu: MainMenu;
   activeGame: ActiveGame;
   renderer: Renderer;
+  gameOver: GameOver;
   constructor(app: Application, renderer: Renderer) {
     this.app = app;
+    this.renderer = renderer;
     this.context = null;
     this.mainMenu = this.initMainMenu();
-    this.renderer = renderer;
-    this.activeGame = new ActiveGame(this.app, this.renderer);
-    this.renderer = renderer;
+    this.activeGame = this.initActiveGame();
+    this.gameOver = this.initGameOver(0);
     this.setContext("MainMenu");
   }
+
   setContext(newContext: Context) {
-    console.log(this.app);
     if (this.context === newContext) return;
     this.context = newContext;
+
     if (this.context === "MainMenu") {
       this.mainMenu = this.initMainMenu();
       this.app.stage.addChild(this.mainMenu.render());
     }
     if (this.context === "ActiveGame") {
+      this.activeGame.destroy();
       this.mainMenu.destroy();
-      this.activeGame = new ActiveGame(this.app, this.renderer);
+      this.gameOver.destroy();
+      this.activeGame = new ActiveGame(this.app, this.renderer, this);
       this.app.stage.addChild(this.activeGame.render());
-      console.log(this.app.stage);
-      console.log("rendering active game");
+    }
+    if (this.context === "GameOver") {
+      this.gameOver = this.initGameOver(this.activeGame.getScore());
+      this.app.stage.addChild(this.gameOver.render());
     }
   }
 
@@ -54,6 +61,26 @@ export default class ContextManager {
     return mainMenu;
   }
 
+  private initActiveGame() {
+    return new ActiveGame(this.app, this.renderer, this);
+  }
+
+  private initGameOver(score: number) {
+    const gameOver = new GameOver(
+      score,
+      {
+        width: this.app.view.width,
+        height: this.app.view.height,
+      },
+      this.app,
+      this
+    );
+    return gameOver;
+  }
+
+  getContext() {
+    return this.context;
+  }
   private destoryMainMenu() {}
 
   private initPauseMenu() {}

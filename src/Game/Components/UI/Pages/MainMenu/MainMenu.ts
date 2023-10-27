@@ -37,7 +37,6 @@ export default class MainMenu {
       this.dims.height / 12,
       this.dims.width / 25,
       () => {
-        console.log("clicked");
         this.context.setContext("ActiveGame");
         // this.container.renderable = false;
       }
@@ -56,13 +55,10 @@ export default class MainMenu {
   }
 
   destroy() {
-    const ctx = this.app.stage.getChildByName("MainMenu");
-    if (ctx) {
-      console.log("destroying main menu");
-      this.app.stage.removeChild(ctx);
-    } else {
-      console.log("could not find main menu");
-    }
+    this.container.destroy({
+      children: true,
+      texture: true,
+    });
   }
 
   createGameNameText() {
