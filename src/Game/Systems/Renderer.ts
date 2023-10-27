@@ -7,7 +7,7 @@ export default class Renderer {
     this.app = app;
     this.updatables = [];
     this.app.ticker.add((deltaTime) => {
-      console.log(this.app.ticker.FPS);
+      // console.log(this.app.ticker.FPS);
       this.update(deltaTime);
     });
     this.app.ticker.maxFPS = 60;

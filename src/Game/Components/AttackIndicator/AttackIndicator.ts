@@ -4,6 +4,7 @@ import { IntersectionChecker } from "../../Systems/util";
 import type Block from "../Block/Block";
 
 import type { Coords } from "../../types/2d.utils";
+import type { intersection } from "astro/zod";
 
 /**
  * WHAT THIS NEEDS TO RUN
@@ -14,26 +15,45 @@ import type { Coords } from "../../types/2d.utils";
  */
 export default class AttackIndicator {
   container: Container;
-  cursor: Container;
   tileWidth: number;
   board: Array<Array<Block | null>>;
   gridSnap: boolean;
   tracerRadius: number;
   boardCoords: Coords;
   scale: number;
-  constructor(tileWidth: number, board: Array<Array<Block | null>>) {
+  world: Container;
+  worldScale: number;
+  constructor(
+    tileWidth: number,
+    world: Container,
+    worldScale: number,
+    board: Array<Array<Block | null>>
+  ) {
     this.container = new Container();
-    this.cursor = new Container();
     this.tileWidth = tileWidth;
+    this.worldScale = worldScale;
     this.board = board;
+    this.world = world;
     this.gridSnap = true;
     this.tracerRadius = 1;
     this.boardCoords = { x: 0, y: 0 };
     this.scale = 0.15;
+
+    this.init();
+  }
+
+  init() {
+    this.container.renderable = false;
+    console.log(this.world.x);
+    this.world.onmousemove = (event) => {
+      this.container.renderable = true;
+
+      this.update(event.getLocalPosition(this.world));
+    };
   }
 
   render() {
-    return [this.container, this.cursor];
+    return this.container;
   }
 
   update(mouseCoords: Coords) {
@@ -42,8 +62,6 @@ export default class AttackIndicator {
       mouseCoords.y,
       this.tileWidth
     );
-    this.cursor.position.x = mouseCoords.x;
-    this.cursor.position.y = mouseCoords.y;
     if (this.gridSnap) {
       this.container.x =
         this.boardCoords.x * this.tileWidth + this.tileWidth / 2;

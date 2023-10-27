@@ -11,6 +11,7 @@ import type { Dimensions } from "../types/2d.utils";
 
 import { Howl } from "howler";
 import type ContextManager from "./ContextManager";
+import SoundManager from "./SoundManager";
 
 const baseUrl = import.meta.env.BASE_URL;
 //---
@@ -25,6 +26,7 @@ export default class LogicController {
   gameover: boolean;
   numTiles: number;
   context: ContextManager;
+  soundManager: SoundManager;
 
   constructor(
     boardDims: Dimensions,
@@ -43,8 +45,11 @@ export default class LogicController {
     this.score = score;
     this.timer = timer;
     this.gameover = false;
-    const blockDensity = 0.8;
-    this.numTiles = Math.round(boardDims.height * boardDims.width * 0.8);
+    const blockDensity = 0.71;
+    this.numTiles = Math.round(
+      boardDims.height * boardDims.width * blockDensity
+    );
+    this.soundManager = new SoundManager();
   }
 
   tick(deltaTime: number) {
@@ -139,6 +144,7 @@ export default class LogicController {
       }
     }
     container.sortableChildren = true;
+    console.log(this.getBlockCount());
     return container;
   }
 
@@ -165,7 +171,7 @@ export default class LogicController {
     if (this.gameover) return;
 
     if (this.boardData[y][x] != null) {
-      this.timer.applyPenalty();
+      this.handleMiss();
       return;
     }
 
@@ -204,16 +210,16 @@ export default class LogicController {
 
     if (hits.size > 0) {
       this.moveStack.push(hits);
-      const popSound = new Howl({
-        src: [`${baseUrl}/sounds/effects/pop.mp3`],
-        volume: 0.2,
-      });
-
-      popSound.play();
+      // const popSound = new Howl({
+      //   src: [`${baseUrl}/sounds/effects/pop.mp3`],
+      //   volume: 0.2,
+      // });
+      this.soundManager.effects.pop();
+      // popSound.play();
 
       this.score.addPoints(hits.size);
     } else {
-      this.timer.applyPenalty();
+      this.handleMiss();
     }
     // if (hits.size === 0) {
     //   progressTimer.value -= 200;
@@ -236,5 +242,10 @@ export default class LogicController {
 
   addTickers(data: Array<any>) {
     this.tickers.push(...data);
+  }
+
+  handleMiss() {
+    this.soundManager.effects.swish();
+    this.timer.applyPenalty();
   }
 }
