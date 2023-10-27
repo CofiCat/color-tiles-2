@@ -47,7 +47,7 @@ export default class LogicController {
     this.numTiles = Math.round(boardDims.height * boardDims.width * 0.8);
   }
 
-  tick() {
+  tick(deltaTime: number) {
     if (this.context.getContext() === "GameOver") return;
     if (this.timer.hasEnded()) {
       score.set(this.score.getScore());
@@ -60,12 +60,12 @@ export default class LogicController {
     this.tickers.forEach((cur, i) => {
       if (cur.hasLifetime()) {
         if (cur.getLifetime() > 0) {
-          cur.tick();
+          cur.tick(deltaTime);
         } else {
           toRemove.add(i);
         }
       } else {
-        cur.tick();
+        cur.tick(deltaTime);
       }
     });
     if (toRemove.size === 0) return;
@@ -197,7 +197,7 @@ export default class LogicController {
       block.destroyed = true;
       block.hasGravity = true;
       block.getSprite().zIndex = 1000;
-      block.applyForce({ x: Math.random() * 5 - 2.5, y: -3 });
+      block.applyForce({ x: Math.random() * 10 - 5, y: -5 });
       const blockPos = block.getBoardPos();
       this.boardData[blockPos.y][blockPos.x] = null;
     });

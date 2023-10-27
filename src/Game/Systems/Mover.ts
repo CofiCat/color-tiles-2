@@ -5,7 +5,7 @@ type Vector2 = {
   y: number;
 };
 
-const scale = 60;
+const scale = 30;
 const gravity = 0.2 / scale;
 const drag = 0.00001 / scale;
 
