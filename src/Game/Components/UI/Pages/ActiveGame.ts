@@ -40,7 +40,7 @@ export default class ActiveGame {
     this.boardDims = { width: 20, height: 14 };
     this.score = new Score(this.app);
     this.timer = new TimerBar(
-      20000,
+      6000,
       this.sceneDims.width * 0.8,
       this.sceneDims.height / 10 / 2
     );

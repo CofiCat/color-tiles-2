@@ -2,7 +2,9 @@ import { Application, Container, Graphics } from "pixi.js";
 import Mouse from "./Components/UI/Mouse/Mouse";
 import Renderer from "./Systems/Renderer";
 import ContextManager from "./Systems/ContextManager";
-import MainMenu from "./Components/UI/Pages/MainMenu/MainMenu";
+
+const baseUrl = import.meta.env.BASE_URL;
+
 export default class GameInstance {
   domParentId: string;
   app: Application<HTMLCanvasElement>;
@@ -19,6 +21,8 @@ export default class GameInstance {
     this.contextManager = new ContextManager(this.app, this.renderer);
 
     this.app.stage.sortChildren();
+
+    this.initMusic();
   }
 
   createApp() {
@@ -70,7 +74,15 @@ export default class GameInstance {
     return { mouse, background };
   }
 
-  gameOverHandler() {}
-
-  initContext() {}
+  initMusic() {
+    const undergroundMusic = new Howl({
+      src: [`${baseUrl}/sounds/music/underground.wav`],
+      loop: true,
+    });
+    // Play the sound.
+    undergroundMusic.play();
+    // nightMusic.play();
+    // Change global volume.
+    Howler.volume(1);
+  }
 }

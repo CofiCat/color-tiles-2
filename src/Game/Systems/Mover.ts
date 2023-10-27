@@ -5,8 +5,8 @@ type Vector2 = {
   y: number;
 };
 
-const scale = 30;
-const gravity = 0.2 / scale;
+const scale = 40;
+const gravity = 0.6 / scale;
 const drag = 0.00001 / scale;
 
 const terminalVelocity = 10 / scale;
