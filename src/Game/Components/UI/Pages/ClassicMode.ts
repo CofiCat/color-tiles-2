@@ -7,7 +7,6 @@ import Board from "../../Board/Board";
 import type Renderer from "../../../Systems/Renderer";
 import type ContextManager from "../../../Systems/ContextManager";
 import AttackIndicator from "../../AttackIndicator/AttackIndicator";
-import { transitionEnabledOnThisPage } from "astro:transitions/client";
 
 const theme = {
   light: { primary: 0xeeeeee, secondary: 0xdddddd },
@@ -19,7 +18,7 @@ const theme = {
 
 const curTheme = theme.night;
 
-export default class ActiveGame {
+export default class ClassicMode {
   container: Container;
   app: Application;
   logicController: LogicController;

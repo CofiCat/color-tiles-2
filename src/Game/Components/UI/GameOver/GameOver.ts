@@ -46,7 +46,7 @@ export default class GameOver {
       this.dims.height / 12,
       this.dims.width / 25,
       () => {
-        this.context.setContext("ActiveGame");
+        this.context.setContext("ClassicMode");
         // this.container.renderable = false;
       }
     );

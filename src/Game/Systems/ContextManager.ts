@@ -1,12 +1,12 @@
 import type { Application } from "pixi.js";
 import MainMenu from "../Components/UI/Pages/MainMenu/MainMenu";
-import ActiveGame from "../Components/UI/Pages/ActiveGame";
+import ClassicMode from "../Components/UI/Pages/ClassicMode";
 import type Renderer from "./Renderer";
 import GameOver from "../Components/UI/GameOver/GameOver";
 
 export type Context =
   | "MainMenu"
-  | "ActiveGame"
+  | "ClassicMode"
   | "PauseMenu"
   | "GameOver"
   | null;
@@ -15,7 +15,7 @@ export default class ContextManager {
   context: Context;
   app: Application;
   mainMenu: MainMenu;
-  activeGame: ActiveGame;
+  classicMode: ClassicMode;
   renderer: Renderer;
   gameOver: GameOver;
   constructor(app: Application, renderer: Renderer) {
@@ -23,7 +23,7 @@ export default class ContextManager {
     this.renderer = renderer;
     this.context = null;
     this.mainMenu = this.initMainMenu();
-    this.activeGame = this.initActiveGame();
+    this.classicMode = this.initActiveGame();
     this.gameOver = this.initGameOver(0);
     this.setContext("MainMenu");
   }
@@ -36,15 +36,15 @@ export default class ContextManager {
       this.mainMenu = this.initMainMenu();
       this.app.stage.addChild(this.mainMenu.render());
     }
-    if (this.context === "ActiveGame") {
-      this.activeGame.destroy();
+    if (this.context === "ClassicMode") {
+      this.classicMode.destroy();
       this.mainMenu.destroy();
       this.gameOver.destroy();
-      this.activeGame = new ActiveGame(this.app, this.renderer, this);
-      this.app.stage.addChild(this.activeGame.render());
+      this.classicMode = new ClassicMode(this.app, this.renderer, this);
+      this.app.stage.addChild(this.classicMode.render());
     }
     if (this.context === "GameOver") {
-      this.gameOver = this.initGameOver(this.activeGame.getScore());
+      this.gameOver = this.initGameOver(this.classicMode.getScore());
       this.app.stage.addChild(this.gameOver.render());
     }
   }
@@ -62,7 +62,7 @@ export default class ContextManager {
   }
 
   private initActiveGame() {
-    return new ActiveGame(this.app, this.renderer, this);
+    return new ClassicMode(this.app, this.renderer, this);
   }
 
   private initGameOver(score: number) {
