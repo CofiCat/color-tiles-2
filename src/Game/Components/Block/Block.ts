@@ -3,7 +3,7 @@ import type BlockManifest from "./blockManifest";
 import Mover from "../../Systems/Mover";
 
 export default class Block extends Mover {
-  private sprite: Sprite;
+  sprite: Sprite;
   destroyed: boolean;
   private boardPos: { x: number; y: number };
   data: (typeof BlockManifest)[number];

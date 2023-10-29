@@ -46,7 +46,17 @@ export default class GameOver {
       this.dims.height / 12,
       this.dims.width / 25,
       () => {
-        this.context.setContext("ClassicMode");
+        this.context.setContext(this.context.prevContext);
+        // this.container.renderable = false;
+      }
+    );
+    const menu = new MenuButton(
+      "Menu",
+      this.dims.width / 2,
+      this.dims.height / 12,
+      this.dims.width / 25,
+      () => {
+        this.context.setContext("MainMenu");
         // this.container.renderable = false;
       }
     );
@@ -56,7 +66,17 @@ export default class GameOver {
     buttonRender.y =
       scoreText.y + buttonRender.height + scoreText.height + padding;
 
-    this.container.addChild(background, gameOverText, scoreText, buttonRender);
+    const menuButton = menu.render();
+    menuButton.x = buttonRender.x;
+    menuButton.y = buttonRender.y + menuButton.height + padding;
+
+    this.container.addChild(
+      background,
+      gameOverText,
+      scoreText,
+      buttonRender,
+      menuButton
+    );
     return this.container;
   }
 

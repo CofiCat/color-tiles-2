@@ -1,12 +1,13 @@
 import { Application, Container } from "pixi.js";
-import LogicController from "../../../Systems/LogicController";
-import Score from "../Score/Score";
-import TimerBar from "../../TimerBar/TimerBar";
-import type { Dimensions } from "../../../types/2d.utils";
-import Board from "../../Board/Board";
-import type Renderer from "../../../Systems/Renderer";
-import type ContextManager from "../../../Systems/ContextManager";
-import AttackIndicator from "../../AttackIndicator/AttackIndicator";
+import ClassicLogicController from "../Classic/ClassicController";
+import Score from "../../../Score/Score";
+import TimerBar from "../../../../TimerBar/TimerBar";
+import type { Dimensions } from "../../../../../types/2d.utils";
+import Board from "../../../../Board/Board";
+import type Renderer from "../../../../../Systems/Renderer";
+import type ContextManager from "../../../../../Systems/ContextManager";
+import AttackIndicator from "../../../../AttackIndicator/AttackIndicator";
+import EndlessLogicController from "./EndlessController";
 
 const theme = {
   light: { primary: 0xeeeeee, secondary: 0xdddddd },
@@ -18,10 +19,10 @@ const theme = {
 
 const curTheme = theme.night;
 
-export default class ClassicMode {
+export default class EndlessMode {
   container: Container;
   app: Application;
-  logicController: LogicController;
+  logicController: EndlessLogicController;
   score: Score;
   timer: TimerBar;
   sceneDims: Dimensions;
@@ -50,7 +51,7 @@ export default class ClassicMode {
       this.sceneDims.width * 0.8,
       this.sceneDims.height / 10 / 2
     );
-    this.logicController = new LogicController(
+    this.logicController = new EndlessLogicController(
       this.boardDims,
       1,
       this.score,

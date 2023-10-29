@@ -18,6 +18,7 @@ export default class MainMenu {
   }
 
   init() {
+    const padding = 20;
     this.container.name = "MainMenu";
     this.container.eventMode = "dynamic";
     const graphics = new Graphics();
@@ -31,8 +32,8 @@ export default class MainMenu {
 
     const titleText = this.createGameNameText();
 
-    const button = new MenuButton(
-      "Start Game",
+    const classic = new MenuButton(
+      "Classic Mode",
       this.dims.width / 2,
       this.dims.height / 12,
       this.dims.width / 25,
@@ -42,11 +43,31 @@ export default class MainMenu {
       }
     );
 
-    const buttonRender = button.render();
-    buttonRender.x = this.dims.width / 50;
-    buttonRender.y = this.dims.height / 10;
+    const endless = new MenuButton(
+      "Endless Mode",
+      this.dims.width / 2,
+      this.dims.height / 12,
+      this.dims.width / 25,
+      () => {
+        this.context.setContext("EndlessMode");
+        // this.container.renderable = false;
+      }
+    );
 
-    this.container.addChild(background, titleText, buttonRender);
+    const classicButton = classic.render();
+    classicButton.x = this.dims.width / 50;
+    classicButton.y = this.dims.height / 10;
+
+    const endlessButton = endless.render();
+    endlessButton.x = classicButton.x;
+    endlessButton.y = classicButton.y + endlessButton.height + padding;
+
+    this.container.addChild(
+      background,
+      titleText,
+      classicButton,
+      endlessButton
+    );
     return this.container;
   }
 

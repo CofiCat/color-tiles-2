@@ -1,22 +1,25 @@
 //---
 import { Container, curves, DisplayObject } from "pixi.js";
-import Block from "../Components/Block/Block";
-import TileManifest from "../Components/Block/blockManifest";
+import Block from "../../../../Block/Block";
+import TileManifest from "../../../../Block/blockManifest";
 
-import { genRandomCoord, IntersectionChecker } from "./util";
-import type Score from "../Components/UI/Score/Score";
-import type TimerBar from "../Components/TimerBar/TimerBar";
-import { ctx, score } from "../../layouts/ctxStore";
-import type { Dimensions } from "../types/2d.utils";
+import {
+  genRandomCoord,
+  IntersectionChecker,
+} from "../../../../../Systems/util";
+import type Score from "../../../Score/Score";
+import type TimerBar from "../../../../TimerBar/TimerBar";
+import { ctx, score } from "../../../../../../layouts/ctxStore";
+import type { Dimensions } from "../../../../../types/2d.utils";
 
 import { Howl } from "howler";
-import type ContextManager from "./ContextManager";
-import SoundManager from "./SoundManager";
+import type ContextManager from "../../../../../Systems/ContextManager";
+import SoundManager from "../../../../../Systems/SoundManager";
 
 const baseUrl = import.meta.env.BASE_URL;
 //---
 
-export default class LogicController {
+export default class EndlessLogicController {
   boardData: Array<Array<null | Block>>;
   tileWidth: number;
   moveStack: Array<Set<Block>>;
@@ -55,9 +58,11 @@ export default class LogicController {
   tick(deltaTime: number) {
     if (this.context.getContext() === "GameOver") return;
     if (this.timer.hasEnded()) {
-      score.set(this.score.getScore());
+      // score.set(this.score.getScore());
+      this.context.data = {
+        score: this.score.getScore(),
+      };
       this.gameover = true;
-      console.log("timer has ended", this.timer);
       this.context.setContext("GameOver");
     }
     // return;
