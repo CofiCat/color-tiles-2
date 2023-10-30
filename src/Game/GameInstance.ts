@@ -30,10 +30,11 @@ export default class GameInstance {
     if (!parent) throw new Error("failed to get parent element");
 
     const app = new Application<HTMLCanvasElement>({
-      background: "#1099bb",
+      background: "422c99",
       resizeTo: window,
     });
 
+    app.renderer.events.cursorStyles.default = "none";
     document.body.appendChild(app.view);
     return app;
     // if (window.innerWidth < 1200) {
@@ -54,10 +55,13 @@ export default class GameInstance {
     // this.renderer.addUpdatable(mouse);
     mouse.render().zIndex = 1000;
     const background = new Graphics()
-      .beginFill(0xff99ff)
+      .beginFill(0x422c99)
       .drawRect(0, 0, this.app.screen.width, this.app.screen.height);
     background.eventMode = "dynamic";
 
+    mouse
+      .render()
+      .scale.set((this.app.view.width / this.app.view.height) * 1.1);
     this.app.stage.addChild(background, mouse.render());
     return { mouse, background };
   }

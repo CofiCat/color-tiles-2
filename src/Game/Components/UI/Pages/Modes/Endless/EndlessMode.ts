@@ -8,6 +8,9 @@ import type Renderer from "../../../../../Systems/Renderer";
 import type ContextManager from "../../../../../Systems/ContextManager";
 import AttackIndicator from "../../../../AttackIndicator/AttackIndicator";
 import EndlessLogicController from "./EndlessController";
+import { calculateAspectRatioFit } from "../../../../../Systems/util";
+import TopPanel from "../../../Panels/TopPanel";
+import BottomPanel from "../../../Panels/BottomPanel";
 
 const theme = {
   light: { primary: 0xeeeeee, secondary: 0xdddddd },
@@ -44,7 +47,7 @@ export default class EndlessMode {
       height: this.app.view.height / 19.5,
     };
 
-    this.boardDims = { width: 8, height: 14 };
+    this.boardDims = { width: 10, height: 14 };
     this.calculateDims();
     this.worldScale = this.sceneDims.width / this.boardDims.width;
     this.score = new Score(this.app);
@@ -81,14 +84,13 @@ export default class EndlessMode {
 
   init() {
     this.container.name = "ActiveGame";
-    this.container.height = this.app.view.height;
-    this.container.width = this.container.height / (19.5 / 9);
+    // this.container.height = this.app.view.height;
+    // this.container.width = this.container.height / (19.5 / 9);
     this.setupScene();
   }
 
   setupScene() {
     const UI = new Container();
-
     // UI.scale.set(1);
     this.world.scale.set(this.worldScale);
 
@@ -99,23 +101,40 @@ export default class EndlessMode {
       this.aimAssist.render()
     );
 
-    this.container.addChild(this.world, UI);
+    const topPanel = new TopPanel(
+      {
+        width: this.sceneDims.width,
+        height: this.sceneDims.height - this.world.height,
+      },
+      this.timer.render()
+    ).render();
+
+    const bottomPanel = new BottomPanel({
+      width: this.sceneDims.width,
+      height: this.sceneDims.height - this.world.height,
+    }).render();
+
+    bottomPanel.y = this.world.y + this.world.height + bottomPanel.height;
+    this.world.y = topPanel.height;
+    this.container.addChild(topPanel, bottomPanel, this.world, UI);
 
     // fix timer to bottom
-    this.timer.render().y =
-      this.world.height +
-      this.timer.render().height / 1.25 -
-      (this.sceneDims.height - this.world.height) / 2;
-    this.timer.render().x = this.sceneDims.width / 30;
+    // this.timer.render().y =
+    //   this.world.height +
+    //   this.timer.render().height / 1.25 -
+    //   (this.sceneDims.height - this.world.height) / 2;
+    // this.timer.render().x = this.sceneDims.width / 30;
 
     // fix score to right of timer
-    this.score.render().y =
-      this.timer.render().y + this.score.render().height / 4;
+    // this.score.render().y =
+    //   this.timer.render().y + this.score.render().height / 4;
 
-    this.score.getContainer().x =
-      this.timer.render().x + this.timer.render().width + 10;
+    // this.score.getContainer().x =
+    //   this.timer.render().x + this.timer.render().width + 10;
 
     this.renderer.addUpdatable(this.logicController, this.score, this.timer);
+
+    this.container.x = this.app.view.width / 2 - this.container.width / 2;
   }
 
   destroy() {
@@ -150,10 +169,16 @@ export default class EndlessMode {
     this.sceneDims.height = this.boardDims.height * targetAspectRatio + 4;
 
     // determine how much bigger the remaining screen is space is
-    const scale = this.app.view.height / this.sceneDims.height;
+    const scaleY = this.app.view.height / this.sceneDims.height;
+    const scaleX = this.app.view.width / this.sceneDims.width;
 
-    // fit scene to rest of screen;
-    this.sceneDims.width *= scale;
-    this.sceneDims.height *= scale;
+    this.sceneDims.width *= scaleY;
+    this.sceneDims.height *= scaleY;
+    this.sceneDims = calculateAspectRatioFit(
+      this.sceneDims.width,
+      this.sceneDims.height,
+      this.app.view.width,
+      this.app.view.height
+    );
   }
 }
