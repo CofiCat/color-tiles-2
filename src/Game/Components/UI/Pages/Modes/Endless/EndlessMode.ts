@@ -40,11 +40,13 @@ export default class EndlessMode {
     this.app = app;
     this.world = new Container();
     this.sceneDims = {
-      width: this.app.view.width,
-      height: this.app.view.height,
+      width: this.app.view.width / 9,
+      height: this.app.view.height / 19.5,
     };
-    this.boardDims = { width: 20, height: 14 };
-    this.worldScale = this.app.screen.width / this.boardDims.width;
+
+    this.boardDims = { width: 8, height: 14 };
+    this.calculateDims();
+    this.worldScale = this.sceneDims.width / this.boardDims.width;
     this.score = new Score(this.app);
     this.timer = new TimerBar(
       6000,
@@ -79,6 +81,8 @@ export default class EndlessMode {
 
   init() {
     this.container.name = "ActiveGame";
+    this.container.height = this.app.view.height;
+    this.container.width = this.container.height / (19.5 / 9);
     this.setupScene();
   }
 
@@ -136,5 +140,20 @@ export default class EndlessMode {
 
   render() {
     return this.container;
+  }
+
+  calculateDims() {
+    // calculate the aspect ratio that our scene should be based on board dimensions
+    // and the y offset for UI. Target dimensions is Iphone aspect ratio.
+    const targetAspectRatio = 19.5 / 9;
+    this.sceneDims.width = this.boardDims.width * targetAspectRatio;
+    this.sceneDims.height = this.boardDims.height * targetAspectRatio + 4;
+
+    // determine how much bigger the remaining screen is space is
+    const scale = this.app.view.height / this.sceneDims.height;
+
+    // fit scene to rest of screen;
+    this.sceneDims.width *= scale;
+    this.sceneDims.height *= scale;
   }
 }

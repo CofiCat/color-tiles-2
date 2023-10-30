@@ -29,16 +29,20 @@ export default class GameInstance {
     const parent = document.getElementById(this.domParentId);
     if (!parent) throw new Error("failed to get parent element");
 
-    let app;
+    const app = new Application<HTMLCanvasElement>({
+      background: "#1099bb",
+      resizeTo: window,
+    });
 
-    if (window.innerWidth < 1200) {
-      console.log("creating mobile version");
-      app = this.createMobile(parent);
-    } else {
-      console.log("creating desktop version");
-      app = this.createDesktop(parent);
-    }
+    document.body.appendChild(app.view);
     return app;
+    // if (window.innerWidth < 1200) {
+    //   console.log("creating mobile version");
+    //   app = this.createMobile(parent);
+    // } else {
+    //   console.log("creating desktop version");
+    //   app = this.createDesktop(parent);
+    // }
   }
 
   /**
@@ -50,7 +54,7 @@ export default class GameInstance {
     // this.renderer.addUpdatable(mouse);
     mouse.render().zIndex = 1000;
     const background = new Graphics()
-      .beginFill(0x111111)
+      .beginFill(0xff99ff)
       .drawRect(0, 0, this.app.screen.width, this.app.screen.height);
     background.eventMode = "dynamic";
 
@@ -132,4 +136,6 @@ export default class GameInstance {
 
     return app;
   }
+
+  createBody() {}
 }
