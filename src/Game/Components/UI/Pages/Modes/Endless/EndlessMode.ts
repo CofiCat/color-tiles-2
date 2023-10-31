@@ -46,7 +46,7 @@ export default class EndlessMode {
       height: this.app.view.height / 19.5,
     };
 
-    this.boardDims = { width: 10, height: 17 };
+    this.boardDims = { width: 8, height: 14 };
     this.calculateDims();
     this.worldScale = this.sceneDims.width / this.boardDims.width;
     this.score = new Score(this.app);
@@ -54,13 +54,6 @@ export default class EndlessMode {
       6000,
       this.sceneDims.width * 0.8,
       this.sceneDims.height / 10 / 2
-    );
-    this.logicController = new EndlessLogicController(
-      this.boardDims,
-      1,
-      this.score,
-      this.timer,
-      this.context
     );
     this.board = new Board(
       this.boardDims,
@@ -70,6 +63,14 @@ export default class EndlessMode {
       },
       curTheme.primary,
       curTheme.secondary
+    );
+    this.logicController = new EndlessLogicController(
+      this.boardDims,
+      1,
+      this.score,
+      this.timer,
+      this.context,
+      { width: this.board.render().width, height: this.board.render().height }
     );
     this.aimAssist = new AttackIndicator(
       1,
@@ -91,15 +92,24 @@ export default class EndlessMode {
   setupScene() {
     const UI = new Container();
     // UI.scale.set(1);
+
+    const frameData = {
+      y: this.board.render().y,
+      height: this.board.render().height,
+    };
     this.world.scale.set(this.worldScale);
+    const worldDims = {
+      width: this.boardDims.width * this.worldScale,
+      height: this.boardDims.height * this.worldScale,
+    };
 
     UI.addChild(this.timer.render(), this.score.init());
     this.world.addChild(
       this.board.render(),
-      this.logicController.generateTiles(),
+      this.logicController.render(),
       this.aimAssist.render()
     );
-    this.world.y = this.app.view.height / 2 - this.world.height / 2;
+    this.world.y = this.app.view.height / 2 - worldDims.height / 2;
     const topPanel = new TopPanel(
       {
         width: this.sceneDims.width,
@@ -114,7 +124,7 @@ export default class EndlessMode {
       height: this.world.y,
     }).render();
 
-    bottomPanel.y = this.world.height + this.world.y;
+    bottomPanel.y = worldDims.height + this.world.y;
     this.container.addChild(topPanel, bottomPanel, this.world, UI);
 
     // fix timer to bottom
@@ -188,5 +198,4 @@ export default class EndlessMode {
     console.log(this.sceneDims);
     console.log({ width: this.app.view.width, height: this.app.view.height });
   }
-
 }

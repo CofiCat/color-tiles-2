@@ -1,5 +1,5 @@
 //---
-import { Container, curves, DisplayObject } from "pixi.js";
+import { Container, curves, DisplayObject, Graphics } from "pixi.js";
 import Block from "../../../../Block/Block";
 import TileManifest from "../../../../Block/blockManifest";
 
@@ -15,6 +15,8 @@ import type { Coords, Dimensions } from "../../../../../types/2d.utils";
 import { Howl } from "howler";
 import type ContextManager from "../../../../../Systems/ContextManager";
 import SoundManager from "../../../../../Systems/SoundManager";
+import type { intersection } from "astro/zod";
+import { clamp } from "../../../../../Systems/Mover";
 
 const baseUrl = import.meta.env.BASE_URL;
 //---
@@ -30,13 +32,16 @@ export default class EndlessLogicController {
   numTiles: number;
   context: ContextManager;
   soundManager: SoundManager;
+  container: Container<DisplayObject>;
+  interactable: boolean;
 
   constructor(
     boardDims: Dimensions,
     tileWidth: number,
     score: Score,
     timer: TimerBar,
-    context: ContextManager
+    context: ContextManager,
+    private dims: Dimensions
   ) {
     this.context = context;
     this.boardData = new Array(boardDims.height)
@@ -44,6 +49,7 @@ export default class EndlessLogicController {
       .map(() => new Array(boardDims.width).fill(null));
     this.tileWidth = tileWidth;
     this.moveStack = [];
+    this.interactable = true;
     this.tickers = [];
     this.score = score;
     this.timer = timer;
@@ -52,7 +58,26 @@ export default class EndlessLogicController {
     this.numTiles = Math.round(
       boardDims.height * boardDims.width * blockDensity
     );
+    this.container = new Container();
     this.soundManager = new SoundManager();
+    this.init();
+  }
+
+  init() {
+    this.generateTiles();
+    // const animator = new BlockBoardAnimator(this.container);
+    // this.tickers.push(animator);
+  }
+  drawGhostContainer() {
+    const graphics = new Graphics();
+    graphics.beginFill(0x000000, 0);
+    const rect = graphics.drawRect(0, 0, this.dims.width, this.dims.height);
+    this.container.addChild(rect);
+  }
+
+  animateBoardDrop() {
+    this.interactable = false;
+    this.container.y = -1 * this.container.height;
   }
 
   tick(deltaTime: number) {
@@ -120,15 +145,19 @@ export default class EndlessLogicController {
     }
   }
 
+  render() {
+    return this.container;
+  }
   /**
    *
    * @returns Container with Block sprites
    */
   generateTiles() {
     this.clearBoardData();
+    this.drawGhostContainer();
 
+    const tileContainer = new Container();
     const numPairs = Math.round(this.numTiles / 2);
-    const container = new Container();
     for (let i = 0; i < numPairs; i++) {
       // const tileWidth = 75;
       const tileData = TileManifest[i % TileManifest.length];
@@ -145,13 +174,16 @@ export default class EndlessLogicController {
       for (let j = 0; j < this.boardData[0].length; j++) {
         const cur = this.boardData[i][j];
         if (cur) {
-          container.addChild(cur.getSprite());
+          tileContainer.addChild(cur.getSprite());
         }
       }
     }
-    container.sortableChildren = true;
+    this.container.sortableChildren = true;
+    tileContainer.sortableChildren = true;
+    this.container.addChild(tileContainer);
+    const animator = new BlockBoardAnimator(tileContainer, this);
+    this.tickers.push(animator);
     console.log(this.getBlockCount());
-    return container;
   }
 
   /**
@@ -174,7 +206,7 @@ export default class EndlessLogicController {
   }
 
   checkClear(x: number, y: number) {
-    if (this.gameover) return;
+    if (this.gameover || !this.interactable) return;
 
     if (this.boardData[y][x] != null) {
       this.handleMiss();
@@ -228,7 +260,8 @@ export default class EndlessLogicController {
       // this.gameover = !this.checkBoardSolvable();
       if (!this.checkBoardSolvable()) {
         // this.clearBoardData();
-        this.generateTiles();
+        this.clearAllBlocks();
+        this.handleBoardClear();
       }
     } else {
       this.handleMiss();
@@ -237,7 +270,29 @@ export default class EndlessLogicController {
     //   progressTimer.value -= 200;
     // }
   }
+  async handleBoardClear() {
+    await setTimeout(() => {
+      this.generateTiles();
+      this.timer.addTime(100);
+    }, 1000);
+  }
 
+  clearAllBlocks() {
+    this.boardData.forEach((row) => {
+      row.forEach((block) => {
+        if (block != null) {
+          this.tickers.push(block);
+          console.log("clearing block");
+          block.destroyed = true;
+          block.hasGravity = true;
+          block.getSprite().zIndex = 1000;
+          block.applyForce({ x: Math.random() * 10 - 5, y: -5 });
+          const blockPos = block.getBoardPos();
+          this.boardData[blockPos.y][blockPos.x] = null;
+        }
+      });
+    });
+  }
   handleBlockHit(block: Block) {
     this.tickers.push(block);
     this.score.addPoints(1);
@@ -438,5 +493,39 @@ export default class EndlessLogicController {
     return Math.sqrt(
       Math.pow(pos2.x - pos1.x, 2) + Math.pow(pos2.y - pos1.y, 2)
     );
+  }
+}
+
+class BlockBoardAnimator {
+  lifetime: number;
+  constructor(
+    private container: Container<DisplayObject>,
+    private logicController: EndlessLogicController
+  ) {
+    this.lifetime = 100;
+    this.init();
+  }
+
+  init() {
+    this.container.y = -1 * this.container.height;
+    this.logicController.interactable = false;
+  }
+  tick() {
+    const speed = 0.5;
+    this.container.y = clamp(this.container.y + speed, -100000, 0);
+    if (this.container.y > 0) {
+      this.container.y = 0;
+    } else {
+      this.logicController.interactable = true;
+    }
+    this.lifetime -= 1;
+    console.log(this.container.y);
+  }
+  getLifetime() {
+    console.log(this.lifetime);
+    return this.lifetime;
+  }
+  hasLifetime() {
+    return true;
   }
 }
