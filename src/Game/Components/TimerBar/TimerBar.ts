@@ -1,4 +1,5 @@
 import { Container, Graphics } from "pixi.js";
+import { clamp } from "../../Systems/Mover";
 
 export default class {
   private maxTime: number;
@@ -32,6 +33,9 @@ export default class {
     return this.container;
   }
 
+  addTime(time: number) {
+    this.curTime = clamp(this.curTime + time, -100, this.maxTime);
+  }
   tick(deltaTime: number) {
     this.curTime -= 1 * deltaTime;
     this.drawProgress();

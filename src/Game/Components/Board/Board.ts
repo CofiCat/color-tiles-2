@@ -2,19 +2,14 @@ import { Graphics, Container } from "pixi.js";
 import type { Dimensions } from "../../types/2d.utils";
 
 export default class Board {
-  dims: Dimensions;
-  tileWidth: number;
-  handleTileClick: Function;
-  colorPrim: number;
-  colorOff: number;
   container: any;
 
   constructor(
-    dims: Dimensions,
-    tileWidth: number,
-    handleTileClick: Function,
-    colorPrim: number,
-    colorOff: number
+    public dims: Dimensions,
+    public tileWidth: number,
+    public handleTileClick: Function,
+    public colorPrim: number,
+    public colorOff: number
   ) {
     this.dims = dims;
     this.tileWidth = tileWidth;

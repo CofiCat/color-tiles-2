@@ -1,5 +1,4 @@
 import { Application, Container } from "pixi.js";
-import ClassicLogicController from "../Classic/ClassicController";
 import Score from "../../../Score/Score";
 import TimerBar from "../../../../TimerBar/TimerBar";
 import type { Dimensions } from "../../../../../types/2d.utils";
@@ -47,7 +46,7 @@ export default class EndlessMode {
       height: this.app.view.height / 19.5,
     };
 
-    this.boardDims = { width: 10, height: 14 };
+    this.boardDims = { width: 10, height: 17 };
     this.calculateDims();
     this.worldScale = this.sceneDims.width / this.boardDims.width;
     this.score = new Score(this.app);
@@ -100,22 +99,22 @@ export default class EndlessMode {
       this.logicController.generateTiles(),
       this.aimAssist.render()
     );
-
+    this.world.y = this.app.view.height / 2 - this.world.height / 2;
     const topPanel = new TopPanel(
       {
         width: this.sceneDims.width,
-        height: this.sceneDims.height - this.world.height,
+        height: this.world.y,
       },
       this.timer.render()
     ).render();
 
     const bottomPanel = new BottomPanel({
       width: this.sceneDims.width,
-      height: this.sceneDims.height - this.world.height,
+      // height: (this.sceneDims.height - this.world.height) / 2,
+      height: this.world.y,
     }).render();
 
-    bottomPanel.y = this.world.y + this.world.height + bottomPanel.height;
-    this.world.y = topPanel.height;
+    bottomPanel.y = this.world.height + this.world.y;
     this.container.addChild(topPanel, bottomPanel, this.world, UI);
 
     // fix timer to bottom
@@ -168,17 +167,26 @@ export default class EndlessMode {
     this.sceneDims.width = this.boardDims.width * targetAspectRatio;
     this.sceneDims.height = this.boardDims.height * targetAspectRatio + 4;
 
+    // const scalar =
+    //   this.sceneDims.width < this.sceneDims.height
+    //     ? this.sceneDims.height
+    //     : this.sceneDims.width;
+
     // determine how much bigger the remaining screen is space is
     const scaleY = this.app.view.height / this.sceneDims.height;
     const scaleX = this.app.view.width / this.sceneDims.width;
 
-    this.sceneDims.width *= scaleY;
-    this.sceneDims.height *= scaleY;
+    // this.sceneDims.width *= scalar;
+    // this.sceneDims.height *= scalar;
+
     this.sceneDims = calculateAspectRatioFit(
       this.sceneDims.width,
       this.sceneDims.height,
       this.app.view.width,
       this.app.view.height
     );
+    console.log(this.sceneDims);
+    console.log({ width: this.app.view.width, height: this.app.view.height });
   }
+
 }

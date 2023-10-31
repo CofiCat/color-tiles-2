@@ -1,11 +1,12 @@
 import { Sprite } from "pixi.js";
 import type BlockManifest from "./blockManifest";
 import Mover from "../../Systems/Mover";
+import type { Coords } from "../../types/2d.utils";
 
 export default class Block extends Mover {
   sprite: Sprite;
   destroyed: boolean;
-  private boardPos: { x: number; y: number };
+  private boardPos: Coords;
   data: (typeof BlockManifest)[number];
   private lifetime: number;
 
