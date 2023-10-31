@@ -41,6 +41,10 @@ export default class {
     this.drawProgress();
   }
 
+  subtractTime(time: number) {
+    this.curTime -= time;
+  }
+
   drawProgress() {
     this.progressContainer.removeChildren();
 

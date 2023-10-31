@@ -17,50 +17,46 @@ import type ContextManager from "../../../../../Systems/ContextManager";
 import SoundManager from "../../../../../Systems/SoundManager";
 import type { intersection } from "astro/zod";
 import { clamp } from "../../../../../Systems/Mover";
+import { hazardManifest } from "../../../../Block/hazardManifest";
+import { powerUpManifest } from "../../../../Block/powerUpManifest";
 
 const baseUrl = import.meta.env.BASE_URL;
 //---
 
 export default class EndlessLogicController {
   boardData: Array<Array<null | Block>>;
-  tileWidth: number;
-  moveStack: Array<Set<Block>>;
-  tickers: Array<any>;
-  score: Score;
-  timer: TimerBar;
-  gameover: boolean;
+  moveStack: Array<Set<Block>> = [];
+  tickers: Array<any> = [];
+  gameover: boolean = false;
   numTiles: number;
-  context: ContextManager;
-  soundManager: SoundManager;
-  container: Container<DisplayObject>;
-  interactable: boolean;
-
+  soundManager: SoundManager = new SoundManager();
+  container: Container<DisplayObject> = new Container();
+  interactable: boolean = false;
+  curStage: number = 0;
+  transparentBlocks: Array<Block> = [];
+  coins = 0;
   constructor(
-    boardDims: Dimensions,
-    tileWidth: number,
-    score: Score,
-    timer: TimerBar,
-    context: ContextManager,
+    public boardDims: Dimensions,
+    public tileWidth: number,
+    public score: Score,
+    public timer: TimerBar,
+    public context: ContextManager,
     private dims: Dimensions
   ) {
-    this.context = context;
     this.boardData = new Array(boardDims.height)
       .fill(null)
       .map(() => new Array(boardDims.width).fill(null));
-    this.tileWidth = tileWidth;
-    this.moveStack = [];
-    this.interactable = true;
-    this.tickers = [];
-    this.score = score;
-    this.timer = timer;
-    this.gameover = false;
+
     const blockDensity = 0.71;
     this.numTiles = Math.round(
       boardDims.height * boardDims.width * blockDensity
     );
-    this.container = new Container();
-    this.soundManager = new SoundManager();
     this.init();
+  }
+
+  handleContinue() {
+    // reset timer
+    // remove gameOver context;
   }
 
   init() {
@@ -112,10 +108,8 @@ export default class EndlessLogicController {
       }
     });
     this.tickers = newTickers;
-    console.log(this.tickers);
   }
 
-  restart() {}
   /**
    *
    * @returns the active number of Blocks
@@ -154,6 +148,10 @@ export default class EndlessLogicController {
    */
   generateTiles() {
     this.clearBoardData();
+    this.transparentBlocks.forEach((block) => {
+      block.destroy();
+    });
+    this.transparentBlocks = [];
     this.drawGhostContainer();
 
     const tileContainer = new Container();
@@ -178,12 +176,29 @@ export default class EndlessLogicController {
         }
       }
     }
+
+    if (this.curStage >= 0) {
+      const pos = genRandomCoord(this.boardData);
+      const spikeData = hazardManifest[0];
+      const spikeBlock = this.setTileAtPos(spikeData, pos.x, pos.y, 1);
+      tileContainer.addChild(spikeBlock.getSprite());
+    }
+    if (this.curStage >= 0) {
+      for (let i = 0; i < Math.round(Math.random() * 5); i++) {
+        const pos = genRandomCoord(this.boardData);
+        const coinData = powerUpManifest[0];
+        const coinBlock = new Block(coinData, pos.x, pos.y, 1);
+        // const coinBlock = this.setTileAtPos(coinData, pos.x, pos.y, 1);
+        this.transparentBlocks.push(coinBlock);
+        tileContainer.addChild(coinBlock.getSprite());
+      }
+    }
+
     this.container.sortableChildren = true;
     tileContainer.sortableChildren = true;
     this.container.addChild(tileContainer);
     const animator = new BlockBoardAnimator(tileContainer, this);
     this.tickers.push(animator);
-    console.log(this.getBlockCount());
   }
 
   /**
@@ -204,6 +219,20 @@ export default class EndlessLogicController {
     this.boardData[y][x] = block;
     return block;
   }
+  handleHazard(hazard: Block) {
+    if (hazard.data.color === "spike") {
+      this.timer.subtractTime(500);
+    }
+  }
+
+  handleTransparentBlockHit(block: Block) {
+    if (block.data.color === "coin") {
+      this.coins += 1;
+      this.timer.addTime(1000);
+    }
+    this.soundManager.effects.stageComplete();
+    block.destroy();
+  }
 
   checkClear(x: number, y: number) {
     if (this.gameover || !this.interactable) return;
@@ -223,12 +252,19 @@ export default class EndlessLogicController {
     dirs.forEach((val1, i) => {
       dirs.forEach((val2, j) => {
         if (i != j) {
-          if (
+          if (val1?.data.type === "hazard") {
+            this.handleHazard(val1);
+          } else if (
             val1?.data?.color === val2?.data?.color &&
             val1 != null &&
             val2 != null
           ) {
             hits.add(val1);
+            this.checkTransparentBlockInteraction(
+              val1.getBoardPos(),
+              val2.getBoardPos(),
+              { x, y }
+            );
             hits.add(val2);
           }
         }
@@ -237,7 +273,6 @@ export default class EndlessLogicController {
 
     const adjHits = this.clearAdjacentBlocks(hits);
     const totalHits = new Set([...adjHits, ...hits]);
-    console.log("after", hits);
     let i = -1;
     totalHits.forEach(async (block: Block) => {
       // increaseScore()
@@ -260,8 +295,7 @@ export default class EndlessLogicController {
       // this.gameover = !this.checkBoardSolvable();
       if (!this.checkBoardSolvable()) {
         // this.clearBoardData();
-        this.clearAllBlocks();
-        this.handleBoardClear();
+        this.handleStageComplete();
       }
     } else {
       this.handleMiss();
@@ -275,6 +309,36 @@ export default class EndlessLogicController {
       this.generateTiles();
       this.timer.addTime(100);
     }, 1000);
+  }
+
+  checkTransparentBlockInteraction(
+    pos1: Coords,
+    pos2: Coords,
+    mousePos: Coords
+  ) {
+    const newTransparents: Array<Block> = [];
+    const [minX, maxX] = [Math.min(pos1.x, pos2.x), Math.max(pos1.x, pos2.x)];
+    const [minY, maxY] = [Math.min(pos1.y, pos2.y), Math.max(pos1.y, pos2.y)];
+
+    this.transparentBlocks.forEach((transparentBlock) => {
+      const blockPos = transparentBlock.getBoardPos();
+
+      const isXBetween = blockPos.x >= minX && blockPos.x <= maxX;
+      const isYBetween = blockPos.y >= minY && blockPos.y <= maxY;
+
+      if (
+        (pos1.y === mousePos.y && isXBetween && blockPos.y === mousePos.y) ||
+        (pos1.x === mousePos.x && isYBetween && blockPos.x === mousePos.x) ||
+        (pos2.y === mousePos.y && isXBetween && blockPos.y === mousePos.y) ||
+        (pos2.x === mousePos.x && isYBetween && blockPos.x === mousePos.x)
+      ) {
+        this.handleTransparentBlockHit(transparentBlock);
+      } else {
+        newTransparents.push(transparentBlock);
+      }
+    });
+
+    this.transparentBlocks = newTransparents;
   }
 
   clearAllBlocks() {
@@ -296,7 +360,7 @@ export default class EndlessLogicController {
   handleBlockHit(block: Block) {
     this.tickers.push(block);
     this.score.addPoints(1);
-    this.timer.addTime(10);
+    this.timer.addTime(20);
     block.destroyed = true;
     block.hasGravity = true;
     block.getSprite().zIndex = 1000;
@@ -326,6 +390,12 @@ export default class EndlessLogicController {
   handleMiss() {
     this.soundManager.effects.swish();
     this.timer.applyPenalty();
+  }
+  handleStageComplete() {
+    this.soundManager.effects.stageComplete();
+    this.clearAllBlocks();
+    this.handleBoardClear();
+    this.curStage += 1;
   }
 
   clearAdjacentBlocks(initialBlocks: Set<Block>) {
@@ -375,7 +445,6 @@ export default class EndlessLogicController {
       const down = this.getBlockBelowPos(pos);
       const left = this.getBlockLeftPos(pos);
       const right = this.getBlockRightPos(pos);
-      console.log({ cur, up, down, left, right });
       if (up && up.data.color === cur.data.color) {
         hits.add(up);
         clearAdjacentBlock(up.getBoardPos());
@@ -454,41 +523,40 @@ export default class EndlessLogicController {
   }
 
   checkBoardSolvable() {
-    let solvable = false;
-    this.boardData.forEach((row, y) => {
-      row.forEach((block, x) => {
+    return this.boardData.some((row, y) => {
+      return row.some((block, x) => {
         if (block === null) {
-          const down = IntersectionChecker.getFirstDown(x, y, this.boardData);
-          const up = IntersectionChecker.getFirstUp(x, y, this.boardData);
-          const left = IntersectionChecker.getFirstLeft(x, y, this.boardData);
-          const right = IntersectionChecker.getFirstRight(x, y, this.boardData);
+          const neighbors = [
+            IntersectionChecker.getFirstLeft(x, y, this.boardData),
+            IntersectionChecker.getFirstRight(x, y, this.boardData),
+            IntersectionChecker.getFirstUp(x, y, this.boardData),
+            IntersectionChecker.getFirstDown(x, y, this.boardData),
+          ];
 
-          const dirs = [left, right, up, down];
-          const hits: Set<Block> = new Set();
-          dirs.forEach((val1, i) => {
-            dirs.forEach((val2, j) => {
-              if (i != j) {
-                if (
-                  val1?.data?.color === val2?.data?.color &&
-                  val1 != null &&
-                  val2 != null
-                ) {
+          const hits = new Set();
+
+          for (let i = 0; i < neighbors.length; i++) {
+            for (let j = 0; j < neighbors.length; j++) {
+              if (i !== j) {
+                const val1 = neighbors[i];
+                const val2 = neighbors[j];
+                if (val1?.data?.color === val2?.data?.color && val1 && val2) {
                   hits.add(val1);
                   hits.add(val2);
                 }
               }
-            });
-          });
-          console.log(hits.size);
+            }
+          }
+
           if (hits.size > 0) {
-            solvable = true;
+            return true; // Board is solvable
           }
         }
+
+        return false;
       });
     });
-    return solvable;
   }
-
   calcDistance(pos1: Coords, pos2: Coords) {
     return Math.sqrt(
       Math.pow(pos2.x - pos1.x, 2) + Math.pow(pos2.y - pos1.y, 2)
@@ -519,10 +587,8 @@ class BlockBoardAnimator {
       this.logicController.interactable = true;
     }
     this.lifetime -= 1;
-    console.log(this.container.y);
   }
   getLifetime() {
-    console.log(this.lifetime);
     return this.lifetime;
   }
   hasLifetime() {

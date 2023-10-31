@@ -21,6 +21,9 @@ const effects = {
   tap: {
     path: effectsBasePath + "tap.mp3",
   },
+  stageComplete: {
+    path: effectsBasePath + "stage-complete.mp3",
+  },
 };
 
 class Effects {
@@ -47,5 +50,8 @@ class Effects {
 
   tap() {
     this.play(effects.tap.path, 0.4);
+  }
+  stageComplete() {
+    this.play(effects.stageComplete.path, 0.4);
   }
 }

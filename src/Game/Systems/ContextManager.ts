@@ -1,4 +1,4 @@
-import type { Application } from "pixi.js";
+import { type Application } from "pixi.js";
 import MainMenu from "../Components/UI/Pages/MainMenu/MainMenu";
 import ClassicMode from "../Components/UI/Pages/Modes/Classic/ClassicMode";
 import type Renderer from "./Renderer";
@@ -99,7 +99,9 @@ export default class ContextManager {
   getContext() {
     return this.context;
   }
-
+  public destroyGameOver() {
+    this.gameOver?.destroy();
+  }
   private destroyAllModes() {
     this.classicMode?.destroy();
     this.endlessMode?.destroy();
@@ -109,6 +111,7 @@ export default class ContextManager {
     this.destroyAllModes();
     this.mainMenu?.destroy();
     this.gameOver?.destroy();
+    this.destroyGameOver();
   }
   private destoryMainMenu() {}
 

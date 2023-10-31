@@ -3,26 +3,31 @@ const BlockManifest = [
   {
     path: `${base}/sprites/tile/red.png`,
     color: `red`,
+    type: `block`,
     scale: 0.335,
   },
   {
     path: `${base}/sprites/tile/orange.png`,
     color: `orange`,
+    type: `block`,
     scale: 0.1,
   },
   {
     path: `${base}/sprites/tile/yellow.png`,
     color: `yellow`,
+    type: `block`,
     scale: 0.1,
   },
   {
     path: `${base}/sprites/tile/green.png`,
     color: `green`,
+    type: `block`,
     scale: 0.1,
   },
   {
     path: `${base}/sprites/tile/blue.png`,
     color: `blue`,
+    type: `block`,
     scale: 0.335,
   },
   // {
