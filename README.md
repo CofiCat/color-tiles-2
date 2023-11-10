@@ -4,7 +4,7 @@ Remake of Game Saien HTML5 Games "Color Tiles"
 Original: https://en.gamesaien.com/game/color_tiles/
 
 # How To Play
-Game available at: https://coficat.github.io/color-tiles-2/
+Game available at: https://josephpanossian.github.io/color-tiles-2/
 
 
 Click on a blank space. If the color matches the nearest neighboring tiles, vertically or horizontally, from the clicked space, you get the matching tiles.
